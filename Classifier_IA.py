@@ -29,15 +29,19 @@ class Classifier:
         return predicted_colors
 
     def predict_piece(self, piece_img):
-        hist = cv2.calcHist([piece_img], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
-        hist = cv2.normalize(hist, hist).flatten()
+        hist = self.calculate_histogram(piece_img)
 
         distances = [cv2.compareHist(hist, lego_hist, cv2.HISTCMP_CHISQR) for lego_hist in self.histograms]
 
         predicted_color = self.legos[np.argmin(distances)]
 
         return predicted_color
-    
+    def calculate_histogram(self, img):
+        mask = cv2.inRange(img, np.array([1, 1, 1]), np.array([255, 255, 255]))
+        hist = cv2.calcHist([img], [0, 1, 2], mask, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+        hist = cv2.normalize(hist, hist).flatten()
+        return hist
+        
 
 legos = ['amarillo', 'morado', 'naranja', 'purpura', 'rojo', 'verde-azulado', 'verde-lima']
 classifier = Classifier(legos)
