@@ -1,16 +1,13 @@
-import numpy as np
-import cv2
-from Classifier import Classifier
 import cv2
 
 class Framer:
-    def __init__(self, imagenUrl = None):
+    def __init__(self, img_path = None):
         self.last_bordes_centrales = None
         self.last_next = None
         self.last_hold = None
-        self.imagen = imagenUrl
-        if imagenUrl is not None:
-            self.imagen = cv2.imread(imagenUrl)
+        self.imagen = img_path
+        if img_path is not None:
+            self.imagen = cv2.imread(img_path)
 
     def encontrar_bordes_centrales(self, imagen = None):
         if imagen is None:
@@ -69,64 +66,3 @@ class Framer:
         ]
 
         return self.last_hold
-
-# Ejemplo de uso
-fr = Framer()
-imagen = cv2.imread("./tests/tetris_full2.jpg")
-bordes_central = fr.encontrar_bordes_centrales(imagen)
-
-# Guardar la imagen recortada
-# cv2.imwrite("imagen_tetris_recortada.jpg", imagen_recortada)
-print(f"Bordes central: {bordes_central}")
-cv2.imshow(
-    "Imagen recortada",
-    imagen[
-        bordes_central[0] : bordes_central[1], bordes_central[2] : bordes_central[3]
-    ],
-)
-cv2.waitKey(0)
-
-# Ejemplo de uso
-coordenadas_next = fr.obtener_next(bordes_central)
-
-next_img = imagen[
-    coordenadas_next[0] : coordenadas_next[1], coordenadas_next[2] : coordenadas_next[3]
-]
-
-
-cv2.imshow("Imagen Next_0", next_img)
-cv2.waitKey(0)
-cls = Classifier()
-
-for i in range(1, 6):
-
-    print(f"Coordenadas del Next: {coordenadas_next}")
-    imagen_next = imagen[
-        coordenadas_next[0]
-        + int(
-            (coordenadas_next[1] - coordenadas_next[0]) * ((i - 1) / 5)
-        ) : coordenadas_next[0]
-        + int((coordenadas_next[1] - coordenadas_next[0]) * (i / 5)),
-        coordenadas_next[2] : coordenadas_next[3],
-    ]
-
-    # Calcula las coordenadas del centro de la imagen
-    centro_y, centro_x = imagen_next.shape[0] // 2, imagen_next.shape[1] // 2
-
-    # Pone un pixel blanco en el centro de la imagen
-    print(f"color centro: {imagen_next[centro_y, centro_x]}")
-    imagen_next[centro_y, centro_x] = [255, 255, 255]
-    print(f"precedir color lego: ", cls.predict_piece(imagen_next))
-    cv2.imshow("Imagen Next", imagen_next)
-    cv2.waitKey(0)
-
-
-
-# Ejemplo de uso
-
-coordenadas_hold = fr.obtener_hold(bordes_central)
-print(f"Coordenadas del Hold: {coordenadas_hold}")
-imagen_hold = imagen[coordenadas_hold[0]:coordenadas_hold[1],
-                             coordenadas_hold[2]:coordenadas_hold[3]]
-cv2.imshow("Imagen Hold", imagen_hold)
-cv2.waitKey(0)

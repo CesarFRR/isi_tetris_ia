@@ -13,23 +13,34 @@ class Classifier:
             hist = cv2.normalize(hist, hist).flatten()
             self.histograms.append(hist)
 
-    def predict_pieces(self, image_path, num_pieces):
-        img = cv2.imread(image_path)
-        height, _, _ = img.shape
-        piece_height = height // num_pieces
+    def predict_pieces(self, image: str | object, num_pieces, coordenadas)-> list[str]:
+        # Carga la imagen
+        img = image
+        if isinstance(image, str):
+            img = cv2.imread(image)
+        
+        # Divide la imagen en num_pieces piezas y clasifica cada una
+        pieces = []
+        for i in range(1, num_pieces + 1):
+            # print(f"Coordenadas del Next: {coordenadas}")
+            imagen_next = img[
+                coordenadas[0]
+                + int(
+                    (coordenadas[1] - coordenadas[0]) * ((i - 1) / num_pieces)
+                ) : coordenadas[0]
+                + int((coordenadas[1] - coordenadas[0]) * (i / num_pieces)),
+                coordenadas[2] : coordenadas[3],
+            ]
 
-        predicted_colors = []
-        for i in range(num_pieces):
-            piece_img = img[i*piece_height:(i+1)*piece_height, :]
-            cv2.imshow("Cropped Image", piece_img)  # Display the cropped image
-            cv2.waitKey(0)
-            predicted_color = self.predict_piece(piece_img)
-            predicted_colors.append(predicted_color)
+            pieces.append(self.predict_piece(imagen_next))
+            # ver las imagenes de cada pieza:
 
-
-        return predicted_colors
-
-    def predict_piece(self, piece_img):
+            # print(f"Predecir color lego: ", pieces[i-1])
+            # cv2.imshow("Imagen Next", imagen_next)
+            # cv2.waitKey(0)
+        print(pieces)
+        return pieces
+    def predict_piece(self, piece_img)-> str:
         hist = self.calculate_histogram(piece_img)
 
         distances = [cv2.compareHist(hist, lego_hist, cv2.HISTCMP_CHISQR) for lego_hist in self.histograms]
