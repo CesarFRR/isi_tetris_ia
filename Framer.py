@@ -66,3 +66,40 @@ class Framer:
         ]
 
         return self.last_hold
+    
+    def obtener_grid(self, bordes, imagen = None):
+        if imagen is None:
+            imagen = self.imagen
+        h = bordes[1] - bordes[0]
+        w = bordes[3] - bordes[2]
+        borde_superior_grid = bordes[0] 
+        borde_inferior_grid = bordes[1] - int(0.01 * h)
+        borde_izquierdo_grid =  bordes[2] + int(0.26 * h)
+        borde_derecho_grid = bordes[2] + int(0.717 * w)
+
+        self.last_grid = [
+            borde_superior_grid,
+            borde_inferior_grid,
+            borde_izquierdo_grid,
+            borde_derecho_grid,
+        ]
+
+        return self.last_grid
+    
+    def obtener_bordes_centrales_img(self, imagen=None):
+        if imagen is None:
+            imagen = self.imagen.copy()
+        bordes = self.encontrar_bordes_centrales(imagen)
+        return imagen[bordes[0]:bordes[1], bordes[2]:bordes[3]]
+
+    def obtener_next_img(self, imagen=None):
+        if imagen is None:
+            imagen = self.imagen.copy()
+        bordes = self.obtener_next(self.last_bordes_centrales, imagen)
+        return imagen[bordes[0]:bordes[1], bordes[2]:bordes[3]]
+
+    def obtener_hold_img(self, imagen=None):
+        if imagen is None:
+            imagen = self.imagen.copy()
+        bordes = self.obtener_hold(self.last_bordes_centrales, imagen)
+        return imagen[bordes[0]:bordes[1], bordes[2]:bordes[3]]

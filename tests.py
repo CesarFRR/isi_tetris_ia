@@ -19,7 +19,7 @@ def framer_test():
     )
     cv2.waitKey(0)
 
-    # Ejemplo de uso
+    # # Ejemplo de uso
     coordenadas_next = fr.obtener_next(bordes_central)
 
     next_img = imagen[
@@ -31,38 +31,49 @@ def framer_test():
     cv2.waitKey(0)
     cls = Classifier()
 
-    for i in range(1, 6):
+    predichas =  cls.predict_pieces(imagen, [3, 4], coordenadas_next)
 
-        print(f"Coordenadas del Next: {coordenadas_next}")
-        imagen_next = imagen[
-            coordenadas_next[0]
-            + int(
-                (coordenadas_next[1] - coordenadas_next[0]) * ((i - 1) / 5)
-            ) : coordenadas_next[0]
-            + int((coordenadas_next[1] - coordenadas_next[0]) * (i / 5)),
-            coordenadas_next[2] : coordenadas_next[3],
-        ]
+    print('PREDICHAS 2 A 4: ', predichas)
 
-        # Calcula las coordenadas del centro de la imagen
-        centro_y, centro_x = imagen_next.shape[0] // 2, imagen_next.shape[1] // 2
+    # for i in range(1, 6):
 
-        # Pone un pixel blanco en el centro de la imagen
-        print(f"color centro: {imagen_next[centro_y, centro_x]}")
-        imagen_next[centro_y, centro_x] = [255, 255, 255]
-        print(f"precedir color lego: ", cls.predict_piece(imagen_next))
-        cv2.imshow("Imagen Next", imagen_next)
-        cv2.waitKey(0)
+    #     print(f"Coordenadas del Next: {coordenadas_next}")
+    #     imagen_next = imagen[
+    #         coordenadas_next[0]
+    #         + int(
+    #             (coordenadas_next[1] - coordenadas_next[0]) * ((i - 1) / 5)
+    #         ) : coordenadas_next[0]
+    #         + int((coordenadas_next[1] - coordenadas_next[0]) * (i / 5)),
+    #         coordenadas_next[2] : coordenadas_next[3],
+    #     ]
 
-    cls.predict_pieces(imagen, 5, coordenadas_next)
+    #     # Calcula las coordenadas del centro de la imagen
+    #     centro_y, centro_x = imagen_next.shape[0] // 2, imagen_next.shape[1] // 2
 
-    # Ejemplo de uso
+    #     # Pone un pixel blanco en el centro de la imagen
+    #     print(f"color centro: {imagen_next[centro_y, centro_x]}")
+    #     imagen_next[centro_y, centro_x] = [255, 255, 255]
+    #     print(f"precedir color lego: ", cls.predict_piece(imagen_next))
+    #     cv2.imshow("Imagen Next", imagen_next)
+    #     cv2.waitKey(0)
 
-    coordenadas_hold = fr.obtener_hold(bordes_central)
-    print(f"Coordenadas del Hold: {coordenadas_hold}")
-    imagen_hold = imagen[coordenadas_hold[0]:coordenadas_hold[1],
-                                coordenadas_hold[2]:coordenadas_hold[3]]
-    cv2.imshow("Imagen Hold", imagen_hold)
+    # cls.predict_pieces(imagen, 5, coordenadas_next)
+
+    coordenadas_grid = fr.obtener_grid(bordes_central)
+    print(f"Coordenadas del Grid: {coordenadas_grid}")
+    imagen_grid = imagen[coordenadas_grid[0]:coordenadas_grid[1],
+                                coordenadas_grid[2]:coordenadas_grid[3]]
+    cv2.imshow("Imagen Grid", imagen_grid)
     cv2.waitKey(0)
+
+    # # Ejemplo de uso
+
+    # coordenadas_hold = fr.obtener_hold(bordes_central)
+    # print(f"Coordenadas del Hold: {coordenadas_hold}")
+    # imagen_hold = imagen[coordenadas_hold[0]:coordenadas_hold[1],
+    #                             coordenadas_hold[2]:coordenadas_hold[3]]
+    # cv2.imshow("Imagen Hold", imagen_hold)
+    # cv2.waitKey(0)
 
 
 def controls_test():
@@ -118,4 +129,11 @@ def controls_test():
 
 
 
-controls_test()
+#controls_test()
+framer_test()
+
+grid = [[0 for _ in range(10)] for _ in range(20)]
+
+# Imprimir la matriz de manera organizada
+for row in grid:
+    print(row)
