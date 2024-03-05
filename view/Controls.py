@@ -155,7 +155,12 @@ class Controls:
         # Presiona la tecla a para girar la pieza a 180 grados
         self.driver.find_element(By.TAG_NAME, 'body').send_keys('a')
         print("tecla a")
-    
+        
+    def perform_actions(self, actions):
+        for action in actions:
+            # Obtén el método con el nombre de acción y llámalo
+            method = getattr(self, action)
+            method()
 
 # c1 = Controls()
 

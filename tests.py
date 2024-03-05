@@ -1,11 +1,11 @@
 def framer_test():
-    from Framer import Framer
-    from Classifier import Classifier
+    from view.Framer import Framer
+    from view.Classifier import Classifier
     import cv2
 
     # Ejemplo de uso
     fr = Framer()
-    imagen = cv2.imread("./tests/tetris_full2.jpg")
+    imagen = cv2.imread("./tests/tetris_ss.jpg")
     bordes_central = fr.encontrar_bordes_centrales(imagen)
 
     # Guardar la imagen recortada
@@ -77,7 +77,7 @@ def framer_test():
 
 
 def controls_test():
-    from Controls import Controls
+    from view.Controls import Controls
     import time
     
     c1 = Controls()
@@ -130,10 +130,32 @@ def controls_test():
 
 
 #controls_test()
-framer_test()
+#framer_test()
 
-grid = [[0 for _ in range(10)] for _ in range(20)]
+# grid = [[0 for _ in range(10)] for _ in range(20)]
 
-# Imprimir la matriz de manera organizada
-for row in grid:
-    print(row)
+# # Imprimir la matriz de manera organizada
+# for row in grid:
+#     print(row)
+        
+
+import numpy as np
+
+def print_matrix(A):
+    for row in A:
+        print(row)
+
+piece_T = np.array([
+    [0, 1, 0],
+    [1, 1, 1],
+    [0, 0, 0]
+])
+
+print("Original:")
+print_matrix(piece_T)
+
+while True:
+    input("\nPresiona Enter para rotar la matriz...")
+    piece_T = np.rot90(piece_T, 3)
+    print("\nRotada:")
+    print_matrix(piece_T)

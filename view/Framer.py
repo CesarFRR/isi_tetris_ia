@@ -1,13 +1,16 @@
 import cv2
+import numpy as np
 
 class Framer:
-    def __init__(self, img_path = None):
+    def __init__(self, img_path = None, img = None | np.ndarray):
         self.last_bordes_centrales = None
         self.last_next = None
         self.last_hold = None
         self.imagen = img_path
         if img_path is not None:
             self.imagen = cv2.imread(img_path)
+        elif img is not None:
+            self.imagen = img
 
     def encontrar_bordes_centrales(self, imagen = None):
         if imagen is None:

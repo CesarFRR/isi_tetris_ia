@@ -1,4 +1,3 @@
-from tkinter import W
 import cv2
 import numpy as np
 import os
