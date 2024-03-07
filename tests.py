@@ -5,7 +5,7 @@ def framer_test():
 
     # Ejemplo de uso
     fr = Framer()
-    imagen = cv2.imread("./tests/tetris_ss.jpg")
+    imagen = cv2.imread("./data/tests/tetris_ss.jpg")
     bordes_central = fr.encontrar_bordes_centrales(imagen)
 
     # Guardar la imagen recortada
@@ -27,8 +27,8 @@ def framer_test():
     ]
 
 
-    cv2.imshow("Imagen Next_0", next_img)
-    cv2.waitKey(0)
+    # cv2.imshow("Imagen Next_0", next_img)
+    # cv2.waitKey(0)
     cls = Classifier()
 
     predichas =  cls.predict_pieces(imagen, [3, 4], coordenadas_next)
@@ -130,7 +130,7 @@ def controls_test():
 
 
 #controls_test()
-#framer_test()
+framer_test()
 
 # grid = [[0 for _ in range(10)] for _ in range(20)]
 
@@ -139,23 +139,24 @@ def controls_test():
 #     print(row)
         
 
-import numpy as np
+# import numpy as np
 
-def print_matrix(A):
-    for row in A:
-        print(row)
+# def print_matrix(A):
+#     for row in A:
+#         print(row)
 
-piece_T = np.array([
-    [0, 1, 0],
-    [1, 1, 1],
-    [0, 0, 0]
-])
+# piece_L = np.array([
+#     [0, 0, 0, 0],
+#     [1, 1, 1, 1],
+#     [0, 0, 0, 0],
+#     [0, 0, 0, 0]
+# ])
 
-print("Original:")
-print_matrix(piece_T)
+# print("Original:")
+# print_matrix(piece_L)
 
-while True:
-    input("\nPresiona Enter para rotar la matriz...")
-    piece_T = np.rot90(piece_T, 3)
-    print("\nRotada:")
-    print_matrix(piece_T)
+# while True:
+#     input("\nPresiona Enter para rotar la matriz...")
+#     piece_L = np.rot90(piece_L, 3)
+#     print("\nRotada:")
+#     print_matrix(piece_L)

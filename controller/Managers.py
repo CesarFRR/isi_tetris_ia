@@ -1,6 +1,6 @@
 from view.Classifier import Classifier
 from view.Framer import Framer
-
+from view.ScreenShot import ScreenShot
 
 fr = Framer()
 
@@ -9,15 +9,22 @@ class NextManager:
         self.img = img
         self.coordenadas_next = coordenadas_next
         self.cls = Classifier()
+        self.ss= ScreenShot()
         self.fr = fr
         self.next_list = self.cls.predict_pieces(self.img, [1, 5], self.coordenadas_next)
+        y1, y2, x1, x2 = self.coordenadas_next
+        h = y2 - y1
+        w = x2 - x1
+        self.new_piece_coord =  [y1 + int(h * ((4) / 5)), x1 , w, int(h)//5 ]
+
 
 
     def get_next_list(self):
         return self.next_list
 
     def update(self):
-        self.next_list[-1] = self.cls.predict_pieces(self.img, [5, 5], self.coordenadas_next)
+        """Actualiza la lista de Next haciendo captura unicamente del sector de la nueva pieza (la quinta) y clasificandola."""
+        self.next_list[-1] = self.cls.predict_piece(self.ss.capture_in(self.new_piece_coord))
         return self
     
     def __str__(self) -> str:

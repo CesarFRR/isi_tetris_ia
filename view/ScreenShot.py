@@ -12,6 +12,11 @@ class ScreenShot:
         region = {'top': 0, 'left': self.margen, 'width': self.w - 2*self.margen, 'height': self.h}
         screenshot = self.sct.grab(region)  # Captura la región especificada
         return np.array(screenshot)  # Convierte la captura de pantalla a un array de NumPy
+    
+    def capture_in(self, top, left, width, height):
+        region = {'top': top, 'left': left, 'width': width, 'height': height}
+        screenshot = self.sct.grab(region)
+        return np.array(screenshot)
 
         
 

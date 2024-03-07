@@ -1,3 +1,4 @@
+from calendar import c
 import cv2
 import numpy as np
 import os
@@ -7,13 +8,13 @@ class Classifier:
     def __init__(self):
         self.legos = [
             os.path.splitext(file)[0]
-            for file in os.listdir("legos")
-            if os.path.isfile(os.path.join("legos", file))
+            for file in os.listdir("data/legos")
+            if os.path.isfile(os.path.join("data/legos", file))
         ]
         self.histograms = []
 
         for name in self.legos:
-            img = cv2.imread(f"legos/{name}.jpg")
+            img = cv2.imread(f"data/legos/{name}.jpg")
             hist = cv2.calcHist(
                 [img], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256]
             )
@@ -25,6 +26,8 @@ class Classifier:
     ) -> list[str]:
         # Carga la imagen
         img = image
+        # cv2.imshow("Imagen Next_hla", img)
+        # cv2.waitKey(0)
         if isinstance(image, str):
             img = cv2.imread(image)
         # Divide la imagen en num_pieces piezas y clasifica cada una
