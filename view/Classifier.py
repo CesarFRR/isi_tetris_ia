@@ -1,4 +1,3 @@
-from calendar import c
 import cv2
 import numpy as np
 import os
@@ -26,8 +25,8 @@ class Classifier:
     ) -> list[str]:
         # Carga la imagen
         img = image
-        # cv2.imshow("Imagen Next_hla", img)
-        # cv2.waitKey(0)
+        cv2.imshow("Imagen Next_hla", img)
+        cv2.waitKey(0)
         if isinstance(image, str):
             img = cv2.imread(image)
         # Divide la imagen en num_pieces piezas y clasifica cada una
@@ -43,9 +42,9 @@ class Classifier:
 
             pieces.append(self.predict_piece(imagen_next))
 
-            # print(f"Predecir color lego: ", pieces[i - a])
-            # cv2.imshow("Imagen Next", imagen_next)
-            # cv2.waitKey(0)
+            print(f"Predecir color lego: ", pieces[i - a])
+            cv2.imshow("Imagen Next", imagen_next)
+            cv2.waitKey(0)
         # print(pieces)
         return pieces
     

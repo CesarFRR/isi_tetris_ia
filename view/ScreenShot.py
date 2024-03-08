@@ -1,22 +1,26 @@
 import mss
 import numpy as np
-
+import cv2
 class ScreenShot:
     def __init__(self):
         self.sct = mss.mss()
-        self.w, self.h = self.sct.monitors[1]["width"], self.sct.monitors[1]["height"]
-        self.margen = self.w // 5
+        self.w, self.h = self.sct.monitors[1]['width'], self.sct.monitors[1]['height']
+        self.margen_w = self.w // 5
+        self.margen_h = self.h // 5
 
     def capture(self):
+        """ Captura una imagen de la pantalla y la devuelve en formato BGR. """
         # Define la región de la pantalla que quieres capturar
-        region = {'top': 0, 'left': self.margen, 'width': self.w - 2*self.margen, 'height': self.h}
-        screenshot = self.sct.grab(region)  # Captura la región especificada
-        return np.array(screenshot)  # Convierte la captura de pantalla a un array de NumPy
+        region = {'top': self.margen_h, 'left': self.margen_w, 'width': self.w - 2*self.margen_w, 'height': self.h- self.margen_h}
+        img = np.array(self.sct.grab(region)) # screenshot!
+        # Descartar el canal Alpha para solo tener RGB
+        img_rgb = img[..., :3]
+        return img_rgb
     
     def capture_in(self, top, left, width, height):
         region = {'top': top, 'left': left, 'width': width, 'height': height}
         screenshot = self.sct.grab(region)
-        return np.array(screenshot)
+        return self.mss_to_bgr(screenshot)
 
         
 

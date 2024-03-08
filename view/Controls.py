@@ -3,16 +3,43 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 from dotenv import load_dotenv
 import os
-# Inicializa el self.driver del navegador (en este caso, Chrome)
 
 
 
+JS_DROP_FILE = """
+    var target = arguments[0],
+        offsetX = arguments[1],
+        offsetY = arguments[2],
+        document = target.ownerDocument || document,
+        window = document.defaultView || window;
+
+    var input = document.createElement('INPUT');
+    input.type = 'file';
+    input.onchange = function () {
+      var rect = target.getBoundingClientRect(),
+          x = rect.left + (offsetX || (rect.width >> 1)),
+          y = rect.top + (offsetY || (rect.height >> 1)),
+          dataTransfer = { files: this.files };
+
+      ['dragenter', 'dragover', 'drop'].forEach(function (name) {
+        var evt = document.createEvent('MouseEvent');
+        evt.initMouseEvent(name, !0, !0, window, 0, 0, 0, x, y, !1, !1, !1, !1, 0, null);
+        evt.dataTransfer = dataTransfer;
+        target.dispatchEvent(evt);
+      });
+
+      setTimeout(function () { document.body.removeChild(input); }, 25);
+    };
+    document.body.appendChild(input);
+    return input;
+"""
+"""Script de javascript para arrastrar y soltar un archivo en un elemento HTML.
+Nota: Es el único método que funciona para arrastrar y soltar archivos del equipo al nevegador en Selenium (Marzo-2024)"""
 
 
 class Controls:
@@ -29,9 +56,11 @@ class Controls:
         self.driver.maximize_window()
 
         # Navega a la página web
+        self.driver.execute_script(F"document.body.style.zoom='80%'")
+
         self.driver.get('https://tetr.io/')
 
-        # Espera 7 segundos
+        # Espera n segundos
         time.sleep(int(self.browser_time))
         print("aplicando zoom con script")
         zoom = os.getenv('BROWSER_ZOOM')
@@ -52,7 +81,9 @@ class Controls:
 
         driver = None
         if self.browser_name == 'EDGE':
-            driver = webdriver.Edge()
+            options = webdriver.EdgeOptions()
+            options.add_argument('--incognito')
+            driver = webdriver.Edge(options=options)
         elif self.browser_name == 'CHROME':
             driver = webdriver.Chrome()
         elif self.browser_name == 'FIREFOX':
@@ -65,6 +96,7 @@ class Controls:
             bp, cv = os.getenv('BROWSER_PATH'), os.getenv('CHROMIUM_VERSION')
             if bp != 'NONE' and cv != 'NONE':
                 options = webdriver.ChromeOptions()
+                options.add_argument('--incognito')
                 options.binary_location = bp
                 driver_version = cv
                 driver = webdriver.Chrome(service=Service(ChromeDriverManager(driver_version).install()), options=options)
@@ -81,7 +113,7 @@ class Controls:
         )
 
         # Introduce 'cesar12321' y presiona ENTER
-        username_input.send_keys('cesar12321' + Keys.ENTER)
+        username_input.send_keys('CESAR12345' + Keys.ENTER)
 
         # Espera a que aparezca el elemento con el ID 'askregister_anon'
         register_button = WebDriverWait(self.driver, 10).until(
@@ -90,26 +122,46 @@ class Controls:
 
         # Hace clic en el elemento con el ID 'askregister_anon' utilizando JavaScript
         self.driver.execute_script("arguments[0].click();", register_button)
+        print('DIRECORIO ACTUAL--->\n\n\n',os.getcwd())
         time.sleep(1)
 
-    
+    def drag_and_drop_file(self, drop_target, path):
+        driver = drop_target.parent
+        file_input = driver.execute_script(JS_DROP_FILE, drop_target, 0, 0)
+        file_input.send_keys(path)
 
     def play_40_l(self):
         # Encuentra el div con id 'play_solo' y haz clic en él
+        # Ruta del archivo a arrastrar
+        
+        ruta_archivo = os.path.abspath("./data/tetris_custom_settings.ttc")  # Reemplaza con la ruta real de tu archivo
+
+        # Buscar el elemento destino en el navegador
+        drop_target = self.driver.find_element(By.ID, "home_menu")
+
+        # Arrastrar el archivo al elemento destino
+        self.drag_and_drop_file(drop_target, ruta_archivo)
+        time.sleep(1)
+        xpath_expression = "/html/body/div[44]/div/div/div[2]"
+        import_button = self.driver.find_element(By.XPATH, xpath_expression)
+        self.driver.execute_script("arguments[0].click();", import_button)
+       
+        time.sleep(0.5)
+
         play_solo_button = self.driver.find_element(By.ID, 'play_solo')
         self.driver.execute_script("arguments[0].click();", play_solo_button)
-        time.sleep(1)
+        time.sleep(0.5)
         # Espera hasta que aparezca el div con id 'game_40l'
         game_40l_button = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'game_40l')))
         self.driver.execute_script("arguments[0].click();", game_40l_button)
         # Espera 3 segundos
-        time.sleep(1)
+        time.sleep(0.5)
 
         # Espera hasta que aparezca el div con id 'start_40l' y haz clic en él
         start_40l_button = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'start_40l')))
         self.driver.execute_script("arguments[0].click();", start_40l_button)
         print("play 40 lines !!")
-        time.sleep(2)
+        time.sleep(1.5)
         self.focus()
 
 

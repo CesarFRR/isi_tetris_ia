@@ -1,12 +1,19 @@
 import numpy as np
 from Pieces import Piece
 class Grid:
-    def __init__(self):
+    def __init__(self, grid=None, h_pieces=None):
         self.width = 10
-        self.height = 20
-        self.grid = np.zeros((self.height, self.width), dtype=int)
-        self.h_pieces=np.zeros(self.width, dtype=int)
+        self.max_height = 20
+        self.h_pieces = np.zeros(self.width, dtype=np.int8) if h_pieces is None else h_pieces
+        initial_height = min(np.max(self.h_pieces) + 4, self.max_height)
+        print('initial_height:',initial_height , self.h_pieces, np.min(self.h_pieces))
+        self.grid = np.zeros((initial_height, self.width), dtype=np.int8) if grid is None else grid
+        self.print_shape()
 
+    def add_rows(self, n):
+        if self.grid.shape[0] + n <= self.max_height:
+            new_rows = np.zeros((n, self.width), dtype=np.int8)
+            self.grid = np.concatenate((new_rows, self.grid), axis=0)
 
     def update_h_pieces(self):
         # Actualiza h_pieces para cada columna
@@ -15,12 +22,14 @@ class Grid:
             if np.all(self.grid[:, col] == 0):
                 self.h_pieces[col] = 0
             else:
-                # De lo contrario, la altura es la fila del primer 1 desde arriba
-                self.h_pieces[col] = np.argmax(self.grid[:, col] != 0)
+                # De lo contrario, la altura es la fila del primer 1 desde abajo
+                self.h_pieces[col] = np.argmax(self.grid[::-1, col] != 0)
 
     def get_h_pieces(self):
         # Devuelve una copia de h_pieces para evitar la modificación externa
         return self.h_pieces.copy()
+    def print_shape(self):
+        print(self.grid.shape)
     
     def get_full_rows(self):
         # Encuentra las filas que están completamente llenas de unos
@@ -33,7 +42,7 @@ class Grid:
     #     p = piece.get_optimized_current_shape()
     #     w_piece = p.shape[0] if p.ndim == 1 else p.shape[1]
 
-        return self.width - (w_piece -1)
+    #    return self.width - (w_piece -1)
     def remove_full_rows(self):
         # Usa get_full_rows para encontrar las filas llenas
         full_rows = self.get_full_rows()
@@ -42,40 +51,34 @@ class Grid:
         if full_rows.size == 0:
             return
 
-        # Usa get_h_pieces para encontrar la fila más alta con un 1
-        highest_piece_row = min(self.get_h_pieces())
-
-        # Mueve todas las filas por encima de la fila llena más alta hacia abajo
-        self.grid[highest_piece_row+1:] = self.grid[:highest_piece_row+1]
-
-        # Llena las filas superiores con ceros
-        self.grid[:highest_piece_row+1] = 0
+        # Crea un nuevo array sin las filas llenas y con nuevas filas de ceros en la parte superior
+        num_full_rows = full_rows.size
+        remaining_rows = np.delete(self.grid, full_rows, axis=0)
+        new_rows = np.zeros((num_full_rows, self.grid.shape[1]))
+        self.grid = np.concatenate((new_rows, remaining_rows), axis=0)
 
         # Actualiza h_pieces
         self.update_h_pieces()
 
-grid = np.zeros((20, 10), dtype=int)
 
-# Añade algunas piezas de Tetris en la parte inferior de la cuadrícula
-grid[18, 3:6] = 1  # Pieza horizontal
-grid[17, 5:8] = 1  # Pieza horizontal
-grid[16:20, 8] = 1  # Pieza vertical
-grid[15:20, 1] = 1  # Pieza vertical
-grid[14:20, 6] = 1  # Pieza vertical
-grid[18, 0:10] =1
-grid[16, 0:10] =1
+
 
 
 
 g1 = Grid()
-g1.grid = grid
+# Añade algunas piezas de Tetris en la parte inferior de la cuadrícula
 print(g1.grid)
+g1.print_shape()
 g1.update_h_pieces()
 print (g1.get_h_pieces())
   # [15 20 20 20 20 20 14 20 20 20]
     
 print (g1.get_full_rows()) # [18]
-
-
+print('\n')
+print(g1.grid)
+g1.print_shape()
+print('\n')
 g1.remove_full_rows()
 print(g1.grid)
+g1.print_shape()
+print('\n')

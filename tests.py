@@ -1,3 +1,6 @@
+from view.ScreenShot import ScreenShot
+import cv2
+import os
 def framer_test():
     from view.Framer import Framer
     from view.Classifier import Classifier
@@ -79,10 +82,12 @@ def framer_test():
 def controls_test():
     from view.Controls import Controls
     import time
+    from view.Framer import Framer
+    from view.Classifier import Classifier
     
-    c1 = Controls()
-
-
+    ctr = Controls()
+    fr = Framer()
+    cls = Classifier()
     # time.sleep(7)
 
     # c1.drop_hard()
@@ -94,43 +99,64 @@ def controls_test():
     # time.sleep(7)
 
 
-    c1.login()
+    ctr.login()
     time.sleep(1)
 
-    c1.play_40_l()
-    print("login!!")
+    ctr.play_40_l()
+    ss = ScreenShot()
+    ctr.focus()
+    #imagenFile = cv2.imread("./data/tests/tetris_full4.jpg")
+    #print("\nimagenFile dimensiones: ", imagenFile.shape)
+
+    imgagen_mss= ss.capture()
+    print("\nimagen_mss dimensiones: ",imgagen_mss.shape)
+    print("\n")
+    fr.encontrar_bordes_centrales(imgagen_mss)
+    coord_next = fr.obtener_next(fr.encontrar_bordes_centrales(imgagen_mss))
+    predichas = cls.predict_pieces(imgagen_mss, [1, 5], coord_next)
+    print('PREDICHAS_control test:\n\n ', predichas)
+    #coord_next_2= fr.obtener_next(fr.encontrar_bordes_centrales(imagenFile))
+    #predichas2 = cls.predict_pieces(imagenFile, [1, 5], coord_next_2)
+
+    #print('PREDICHAS_ tetris full 4--> :\n\n ', predichas)
+    cv2.imshow("imagen", imgagen_mss)
+    cv2.waitKey(0)
+    # print("login!!")
+    # time.sleep(2)
 
     time.sleep(10)
-    for i in range(15):
-        c1.spin_180()
-        if i % 2 == 0:
-            c1.spin_left()
-            c1.move_left()
-            c1.spin_left()
-            c1.move_left()
-            c1.spin_left()
-            c1.move_left()
-            c1.move_right()
-            c1.move_right()
-        else:
-            c1.spin_right()
-            c1.move_right()
-            c1.spin_right()
-            c1.move_right()
-            c1.spin_right()
-            c1.move_right()
-            c1.move_left()
-            c1.move_left()
+    print("sleep de 10 superado!")
+
+    # for i in range(15):
+    #     c1.spin_180()
+    #     if i % 2 == 0:
+    #         c1.spin_left()
+    #         c1.move_left()
+    #         c1.spin_left()
+    #         c1.move_left()
+    #         c1.spin_left()
+    #         c1.move_left()
+    #         c1.move_right()
+    #         c1.move_right()
+    #     else:
+    #         c1.spin_right()
+    #         c1.move_right()
+    #         c1.spin_right()
+    #         c1.move_right()
+    #         c1.spin_right()
+    #         c1.move_right()
+    #         c1.move_left()
+    #         c1.move_left()
         
-        c1.spin_180()
+    #     c1.spin_180()
         
-        c1.spin_180()
-        c1.drop_hard()
+    #     c1.spin_180()
+    #     c1.drop_hard()
 
 
 
-#controls_test()
-framer_test()
+controls_test()
+# framer_test()
 
 # grid = [[0 for _ in range(10)] for _ in range(20)]
 
