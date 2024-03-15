@@ -1,7 +1,9 @@
+from model.Pieces import Piece
 from view.Classifier import Classifier
 from view.Framer import Framer
 from view.ScreenShot import ScreenShot
-
+from model.Grid import Grid
+import numpy as np
 fr = Framer()
 
 class NextManager:
@@ -49,7 +51,7 @@ class HoldManager:
 
 class GridManager:
     def __init__(self):
-        self.grid = [[0 for _ in range(10)] for _ in range(20)]
+        self.grid = Grid()
         self.cls = Classifier()
         self.fr = Framer()
 
@@ -64,6 +66,17 @@ class GridManager:
         for row in self.grid:
             print(row)
         print("\n")
+
+    def compute_piece(self, piece:Piece):
+        """Calcula todas las heuristicas de la pieza para cada columna de grid, sin rotar la pieza"""
+        h_list = np.array([(i, i+1) for i in range(10)], dtype=object)
+        for i in range(self.grid.get_grid_matrix().shape[1]):
+            h_list[i]=self.grid.calculate_heuristics(piece, i)
+        
+        print(h_list)
+        return h_list
+    
+
 
     def __str__(self):
         return '\n'.join(' '.join(str(cell) for cell in row) for row in self.grid)

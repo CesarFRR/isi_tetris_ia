@@ -1,6 +1,9 @@
 from view.ScreenShot import ScreenShot
 import cv2
-import os
+import numpy as np
+from model.Grid import Grid
+from model.Pieces import Green_S
+from control.Managers import GridManager
 def framer_test():
     from view.Framer import Framer
     from view.Classifier import Classifier
@@ -155,7 +158,7 @@ def controls_test():
 
 
 
-controls_test()
+#controls_test()
 # framer_test()
 
 # grid = [[0 for _ in range(10)] for _ in range(20)]
@@ -186,3 +189,36 @@ controls_test()
 #     piece_L = np.rot90(piece_L, 3)
 #     print("\nRotada:")
 #     print_matrix(piece_L)
+
+
+
+
+g1 = Grid()
+# Añade algunas piezas de Tetris en la parte inferior de la cuadrícula
+print(g1.grid)
+
+g1.print_shape()
+print('\n')
+
+grid_test = np.array([
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+    [1, 1, 0, 1, 1, 1, 1, 0, 0, 0]
+])
+print(grid_test)
+h_pieces = np.zeros(grid_test.shape[1], dtype=np.int8)
+for col in range(grid_test.shape[1]):
+    h_pieces[col] = np.argmin(grid_test[::-1, col] == 1)
+
+print('grid local: h_pieces: \n',h_pieces)
+g1.grid = grid_test
+g1.h_pieces = h_pieces
+g1.update_h_pieces()
+print('\n')
+print(g1.grid)
+p1 = Green_S()
+
+gm = GridManager()
+gm.set_grid(g1)
+heuristics_list = gm.compute_piece(p1)

@@ -22,7 +22,7 @@ legos = {
                  [0,0,1,0],
                  [0,0,1,0],
                  [0,0,1,0]]
-                 ]),
+                 ], dtype=np.int8),
     "Fucsia_T":np.array([
         [[0,1,0],
          [1,1,1],
@@ -40,7 +40,7 @@ legos = {
          [1,1,0],
          [0,1,0]],
           
-    ]),
+    ], dtype=np.int8),
     "Green_S": np.array([
         [[0,0,0],
          [0,1,1],
@@ -57,7 +57,7 @@ legos = {
         [[1,0,0],
          [1,1,0],
          [0,1,0]]
-    ]),
+    ],  dtype=np.int8),
     "Orange_L":np.array([
         [[0,0,0],
          [0,0,1],
@@ -74,7 +74,7 @@ legos = {
         [[1,0,0],
          [1,0,0],
          [1,1,0]],
-    ]),
+    ], dtype=np.int8),
     "Purple_L":np.array([
         [[0,0,0],
          [1,0,0],
@@ -91,7 +91,7 @@ legos = {
         [[1,1,0]
         ,[1,0,0]
         ,[1,0,0]],
-    ]),
+    ], dtype=np.int8),
 
     "Red_Z": np.array([
         [[0,0,0],
@@ -110,13 +110,13 @@ legos = {
         ,[1,1,0]
         ,[1,0,0]]
        
-    ]),
+    ], dtype=np.int8),
     "Yellow_sq": np.array([
                 [[0,0,0,0], 
                  [0,1,1,0], 
                  [0,1,1,0], 
                  [0,0,0,0]],
-    ])
+    ], dtype=np.int8)
         
 }
 
@@ -171,7 +171,7 @@ class Piece:
 
 
 
-    def get_shape(self, i=None):
+    def get_matrix(self, i=None):
         if i is not None:
             return self.__get_i_shape(i)
         return self.shapes[self.current_shape]
