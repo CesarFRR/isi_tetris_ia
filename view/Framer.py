@@ -32,9 +32,11 @@ class Framer:
 
         return self.last_bordes_centrales
 
-    def obtener_next(self, bordes, imagen = None):
+    def obtener_next(self, bordes=None, imagen = None):
         if imagen is None:
             imagen = self.imagen
+        if bordes is None:
+            bordes = self.last_bordes_centrales
         h = bordes[1] - bordes[0]
         w = bordes[3] - bordes[2]
         borde_superior_next = bordes[0] + int(0.05 * h)
@@ -51,9 +53,11 @@ class Framer:
 
         return self.last_next
 
-    def obtener_hold(self, bordes, imagen = None):
+    def obtener_hold(self, bordes=None, imagen = None):
         if imagen is None:
             imagen = self.imagen
+        if bordes is None:
+            bordes = self.last_bordes_centrales
         h = bordes[1] - bordes[0]
         w = bordes[3] - bordes[2]
         borde_superior_hold = bordes[0] + int(0.05 * h)
@@ -70,9 +74,11 @@ class Framer:
 
         return self.last_hold
     
-    def obtener_grid(self, bordes, imagen = None):
+    def obtener_grid(self, bordes=None, imagen = None):
         if imagen is None:
             imagen = self.imagen
+        if bordes is None:
+            bordes = self.last_bordes_centrales
         h = bordes[1] - bordes[0]
         w = bordes[3] - bordes[2]
         borde_superior_grid = bordes[0] 

@@ -25,14 +25,14 @@ class Classifier:
     ) -> list[str]:
         # Carga la imagen
         img = image
-        cv2.imshow("Imagen Next_hla", img)
-        cv2.waitKey(0)
+        # cv2.imshow("Imagen Next_hla", img)
+        # cv2.waitKey(0)
         if isinstance(image, str):
             img = cv2.imread(image)
         # Divide la imagen en num_pieces piezas y clasifica cada una
         pieces = []
         a, b = range_pieces
-        print(f"num_pieces: {b} rangos: {a} - {b}")
+        #print(f"num_pieces: {b} rangos: {a} - {b}")
         y1, y2, x1, x2 = coordenadas
         h = y2 - y1
         for i in range(a, b + 1):
@@ -42,10 +42,10 @@ class Classifier:
 
             pieces.append(self.predict_piece(imagen_next))
 
-            print(f"Predecir color lego: ", pieces[i - a])
-            cv2.imshow("Imagen Next", imagen_next)
-            cv2.waitKey(0)
-        # print(pieces)
+            #print(f"Predecir color lego: ", pieces[i - a])
+            # cv2.imshow("Imagen Next", imagen_next)
+            # cv2.waitKey(0)
+        # #print(pieces)
         return pieces
     
 
@@ -70,4 +70,4 @@ class Classifier:
 # classifier = Classifier()
 # predicted_colors = classifier.predict_piece(cv2.imread('./tests/predecir1.jpg'))
 
-# print(predicted_colors)
+# #print(predicted_colors)

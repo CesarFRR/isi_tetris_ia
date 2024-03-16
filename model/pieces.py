@@ -134,10 +134,16 @@ class Piece:
     def __init__(self):
         pass
 
+    def set_current_shape(self, i):
+        if i != self.current_shape:
+            self.current_shape = i
+            self.optimized_current_shape = self.trim_zeros()
+        return self
     
-    def trim_zeros(self):
+    def trim_zeros(self, i=None):
         # Obtén el shape actual
-        shape = self.shapes[self.current_shape]
+
+        shape = self.shapes[self.current_shape if i == None else i]
 
         # Encuentra los índices de los elementos no cero
         indices = np.argwhere(shape)
@@ -149,8 +155,15 @@ class Piece:
         # Crea un nuevo array con los elementos no cero
         trimmed_shape = shape[row_start:row_end, col_start:col_end]
 
+        if col_start == 0:
+            self.grid_position = 3
+        else:
+            self.grid_position = 3 + col_start
+
         return trimmed_shape
-    def get_optimized_current_shape(self):
+    def get_optimized_current_matrix(self, i=None):
+        if i is not None:
+            return self.trim_zeros(i)
         return self.optimized_current_shape
     
     def update_grid_position(self):
@@ -177,7 +190,7 @@ class Piece:
         return self.shapes[self.current_shape]
 
     def __get_i_shape(self, i):
-        # print('i: ', i, type(i), ' len shapes: ', len(self.shapes), type(self.shapes))
+        # #print('i: ', i, type(i), ' len shapes: ', len(self.shapes), type(self.shapes))
         if len(self.shapes) == 0 or i < 0 or i >= len(self.shapes):
             return None
         return self.shapes[i]
@@ -292,46 +305,46 @@ class Yellow_sq(Piece):
 # #     return trimmed_shape
 
 # c1 = Red_Z ()
-# print(c1.current_shape)
-# print(c1)
+# #print(c1.current_shape)
+# #print(c1)
 
 
 # # A2= [[0, 0, 0, 0],[0, 0, 0, 0],[1, 1, 1, 1],[0, 0, 0, 0]]
 
 # # A2_l= len(A2)
 
-# # print(A2_l)
+# # #print(A2_l)
 # # index = 0
 
-# # print('reset para -1: ', (-1) % len(A2))
-# # print(c1.optimized_current_shape)
-# # print(c1.optimized_current_shape.shape)
+# # #print('reset para -1: ', (-1) % len(A2))
+# # #print(c1.optimized_current_shape)
+# # #print(c1.optimized_current_shape.shape)
 # # c1.spin_right()
-# # print('1 vertical:\n',c1)
+# # #print('1 vertical:\n',c1)
 
-# # print(c1.optimized_current_shape)
-# # print(c1.optimized_current_shape.shape)
-# # print('\n')
+# # #print(c1.optimized_current_shape)
+# # #print(c1.optimized_current_shape.shape)
+# # #print('\n')
 
-# print('TRIMED: \n', c1.trim_zeros())
-# print('\n')
+# #print('TRIMED: \n', c1.trim_zeros())
+# #print('\n')
 
-# print(c1.optimized_current_shape)
+# #print(c1.optimized_current_shape)
 
-# print('\n')
+# #print('\n')
 # c1.spin_right()
-# print('1 vertical:\n',c1)
-# print('\n')
-# print('\nNumeor de col con ceros: ', get_first_nonzero_column(c1.get_shape()))
+# #print('1 vertical:\n',c1)
+# #print('\n')
+# #print('\nNumeor de col con ceros: ', get_first_nonzero_column(c1.get_shape()))
 
-# # print('TRIMED: \n', c1.trim_zeros())
-# # print('\n')
+# # #print('TRIMED: \n', c1.trim_zeros())
+# # #print('\n')
 
 
-# def print_shape(shape):
+# def #print_shape(shape):
 #     for row in shape:
-#         print(" ".join(str(int(cell)) for cell in row))
-#     print('\n')
+#         #print(" ".join(str(int(cell)) for cell in row))
+#     #print('\n')
 # # Tu figura
 # shape = np.array([[0,1,0],
 #                   [1,1,1],
@@ -344,24 +357,24 @@ class Yellow_sq(Piece):
 #                [0,1,0,0]])
 
 # # Posiciona la figura en la matriz 4x4
-# print_shape(new_shape)
-# print('\nNumeor de col con ceros: ', get_first_nonzero_column(new_shape))
-# print('\n')
+# #print_shape(new_shape)
+# #print('\nNumeor de col con ceros: ', get_first_nonzero_column(new_shape))
+# #print('\n')
 # rot90 = np.rot90(new_shape)
 
-# print_shape(rot90)
-# print('\nNumeor de col con ceros: ', get_first_nonzero_column(rot90))
+# #print_shape(rot90)
+# #print('\nNumeor de col con ceros: ', get_first_nonzero_column(rot90))
 # rot90 = np.rot90(rot90)
 
-# print_shape(rot90)
-# print('\nNumeor de col con ceros: ', get_first_nonzero_column(rot90))
-
-# rot90 = np.rot90(rot90)
-
-# print_shape(rot90)
-# print('\nNumeor de col con ceros: ', get_first_nonzero_column(rot90))
+# #print_shape(rot90)
+# #print('\nNumeor de col con ceros: ', get_first_nonzero_column(rot90))
 
 # rot90 = np.rot90(rot90)
 
-# print_shape(rot90)
-# print('\nNumeor de col con ceros: ', get_first_nonzero_column(rot90))
+# #print_shape(rot90)
+# #print('\nNumeor de col con ceros: ', get_first_nonzero_column(rot90))
+
+# rot90 = np.rot90(rot90)
+
+# #print_shape(rot90)
+# #print('\nNumeor de col con ceros: ', get_first_nonzero_column(rot90))

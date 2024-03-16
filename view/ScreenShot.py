@@ -19,10 +19,13 @@ class ScreenShot:
     
     def capture_in(self, top, left, width, height):
         region = {'top': top, 'left': left, 'width': width, 'height': height}
-        screenshot = self.sct.grab(region)
-        return self.mss_to_bgr(screenshot)
+        img = np.array(self.sct.grab(region)) # screenshot!
+        img_rgb = img[..., :3]
+        cv2.imshow('Screenshot', img_rgb)
+        cv2.waitKey(0)
+        return img_rgb
 
-        
+           
 
 # ss = ScreenShot()
 # time.sleep(5)
