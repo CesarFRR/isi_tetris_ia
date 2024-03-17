@@ -23,7 +23,7 @@ def framer_test():
 
     # Guardar la imagen recortada
     # cv2.imwrite("imagen_tetris_recortada.jpg", imagen_recortada)
-    print(f"Bordes central: {bordes_central}")
+    #print(f"Bordes central: {bordes_central}")
     cv2.imshow(
         "Imagen recortada",
         imagen[
@@ -46,7 +46,7 @@ def framer_test():
 
     predichas =  cls.predict_pieces(imagen, [3, 4], coordenadas_next)
 
-    print('PREDICHAS 2 A 4: ', predichas)
+    #print('PREDICHAS 2 A 4: ', predichas)
 
     # for i in range(1, 6):
 
@@ -73,7 +73,7 @@ def framer_test():
     # cls.predict_pieces(imagen, 5, coordenadas_next)
 
     coordenadas_grid = fr.obtener_grid(bordes_central)
-    print(f"Coordenadas del Grid: {coordenadas_grid}")
+    #print(f"Coordenadas del Grid: {coordenadas_grid}")
     imagen_grid = imagen[coordenadas_grid[0]:coordenadas_grid[1],
                                 coordenadas_grid[2]:coordenadas_grid[3]]
     cv2.imshow("Imagen Grid", imagen_grid)
@@ -181,7 +181,7 @@ def controls_test():
     current_piece = next_m.pop_piece()
     print("current_piece: ", current_piece)
     piece = getattr(model.Pieces, current_piece)()
-    print("piece: ", piece, type(piece))
+    #print("piece: ", piece, type(piece))
     best_choice= grid_m.get_best_choice(piece)
     print("best choice: ", best_choice)
     actions = generate_actions(best_choice, piece, grid_m.grid)
@@ -192,10 +192,10 @@ def controls_test():
     print("Desde aqui se empieza a juagar, los tiempos y el time de 7.5 son necesarios, no removerlos")
     print("=========================================")
     play= True
-    print("actions: ", actions)
+   # print("actions: ", actions)
     ctr.perform_actions(actions)
     grid_m.place_piece(piece, best_choice[1], best_choice[2])
-    #grid_m.update_grid()
+    grid_m.update_grid()
     next_m.update()
     #print_grid(0)
     while(play):
@@ -203,22 +203,28 @@ def controls_test():
         current_piece = next_m.pop_piece()
         print("\ncurrent_piece: ", current_piece)
         piece = getattr(model.Pieces, current_piece)()
-        print_grid(3)
+        #print_grid(3)
         best_choice= grid_m.get_best_choice(piece)
-        print_grid(4)
+        max_value_0, max_value_1, max_index, indices = best_choice
+        best_choice = (max_value_0, max_value_1, max_index)
         print("best choice: ", best_choice)
         #actions do--> TODO
         actions = generate_actions(best_choice, piece, grid_m.grid)
-        print("actions: ", actions)
+        #print("actions: ", actions)
         ctr.perform_actions(actions)
         #print_grid(5)
+        #grid_m.place_piece (piece, best_choice[1], best_choice[2])
+        grid_m.grid.place_piece(indices=indices)
+        #print_grid(6)
+        grid_m.update_grid()
+        next_m.update()
         if ctr.check_game_over():
             play= False
             print(txt_game_over)
-        grid_m.place_piece (piece, best_choice[1], best_choice[2])
-        #print_grid(6)
-       # grid_m.update_grid()
-        next_m.update()
+        print('\nh_pieces:\n', grid_m.grid.h_pieces)
+        print_grid(99)
+        time.sleep(1)
+
 
 
 
