@@ -1,3 +1,4 @@
+from cgi import test
 from view.Classifier import Classifier
 from view.Framer import Framer
 from view.ScreenShot import ScreenShot
@@ -120,3 +121,12 @@ print(results_1)
 
 print(generate_actions(results_1, p, grid_m.grid))
 
+def print_grid(grid):
+    for row in grid:
+        for col in row:
+            print(col, end=" ")
+        print()
+g2= np.array(grid_test.copy(), dtype=object)
+g2[0][0] = 'X'
+
+print_grid(g2)

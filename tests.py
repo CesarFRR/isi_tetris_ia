@@ -161,8 +161,12 @@ def controls_test():
     fr.encontrar_bordes_centrales()
 
     next_m, grid_m, hold_m = NextManager(img_0, fr.obtener_next()), GridManager(), HoldManager()
-    def print_grid(i:int):
-        print(f"grid {i}: \n", grid_m.grid.grid)
+    def print_grid(grid):
+        for row in grid:
+            for col in row:
+                print(col, end=" ")
+            print()
+        
     # imgagen_mss= ss.capture()
     # print("\nimagen_mss dimensiones: ",imgagen_mss.shape)
     # print("\n")
@@ -179,42 +183,46 @@ def controls_test():
     # # print("login!!")
     # # time.sleep(2)
 
-    print("sleep de 10 superado!")
+    # print("sleep de 10 superado!")
+    # print('next list: ', next_m.get_next_list())
+    
 
+    time.sleep(9)
+    print("COMENZANDO A JUGAR")
+    print("Desde aqui se empieza a jugar, los tiempos y el time de 9s son necesarios, no removerlos")
+    print("=========================================")
+    play= True
     current_piece = next_m.pop_piece()
+    print('POP!!!##=====>', current_piece)
     print("current_piece: ", current_piece)
+
     piece = getattr(model.Pieces, current_piece)()
     #print("piece: ", piece, type(piece))
     best_choice= grid_m.get_best_choice(piece)
     print("best choice: ", best_choice)
     actions = generate_actions(best_choice, piece, grid_m.grid)
-    
-
-    time.sleep(9)
-    print("COMENZANDO A JUGAR")
-    print("Desde aqui se empieza a juagar, los tiempos y el time de 9s son necesarios, no removerlos")
-    print("=========================================")
-    play= True
    # print("actions: ", actions)
-    ctr.perform_actions(actions)
-    grid_m.place_piece(piece, best_choice[1], best_choice[2])
-    grid_m.update_grid()
-    next_m.update()
+    # ctr.perform_actions(actions)
+    # grid_m.place_piece(piece, best_choice[1], best_choice[2])
+    # grid_m.update_grid()
+    # next_m.update()
     #print_grid(0)
     while(play):
         #print_grid(2)
+        print('next list: ', next_m.get_next_list())
         current_piece = next_m.pop_piece()
+        print('POP!!!##=====>', current_piece)
+        # next_m.update()
         print("\ncurrent_piece: ", current_piece)
         piece = getattr(model.Pieces, current_piece)()
         #print_grid(3)
         best_choice= grid_m.get_best_choice(piece)
-        score, pos, rotation= best_choice
+        score, pos, rotation, indices= best_choice
         best_choice = (score, pos, rotation)
         print("best choice: ", best_choice)
-        print('grid_m.grid: \n', grid_m.grid.grid)
         actions = generate_actions(best_choice, piece, grid_m.grid)
         print("actions: ", actions)
-        time.sleep(2)
+        #time.sleep(2)
         #actions do--> TODO
         #print("actions: ", actions)
         ctr.perform_actions(actions)
@@ -223,7 +231,11 @@ def controls_test():
         grid_m.place_piece(piece, pos, rotation)
         #print_grid(6)
         grid_m.update_grid()
-        next_m.update()
+        view_grid = np.array(grid_m.grid.grid.copy(), dtype=object)
+        for r, c in indices:
+            view_grid[r, c] = 'X'
+        print('grid_m.grid: \n')
+        print_grid(view_grid)
         if ctr.check_game_over():
             play= False
             print(txt_game_over)

@@ -1,4 +1,6 @@
 from calendar import c
+
+import cv2
 from model.Pieces import Piece
 from view.Classifier import Classifier
 from view.Framer import Framer
@@ -49,11 +51,16 @@ class NextManager:
             self.next_list.pop(0)
             self.update()
     def pop_piece(self):
-        
-        return self.next_list.pop(0)
+        new = self.next_list.pop(0)
+        self.update()
+        return new
+
 
     def update(self):
         """Actualiza la lista de Next haciendo captura unicamente del sector de la nueva pieza (la quinta) y clasificandola."""
+        # img = self.ss.capture()
+        # cv2.imshow('next', img[self.coordenadas_next[0]:self.coordenadas_next[1], self.coordenadas_next[2]:self.coordenadas_next[3]])
+        # cv2.waitKey(0)
         self.next_list.append(self.cls.predict_pieces(self.ss.capture(), [5, 5], self.coordenadas_next)[0])
         if len(self.next_list) > 5:
             self.next_list.pop(0)
@@ -144,7 +151,7 @@ class GridManager:
         #print('max_value:', max_value, 'max_index:', max_index)
         #print('GRID DESPUES DEL BEST CHOICE: \n', self.grid.grid)
         print('best_choice:',(max_value[0], max_value[1], max_index))
-        return (max_value[0], max_value[1], max_index)
+        return (max_value[0], max_value[1], max_index, max_value[2])
     
     def place_piece(self, piece:Piece, column:int, rotation:int):
         """Coloca la pieza en la columna y rotacion dada"""

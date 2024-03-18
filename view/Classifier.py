@@ -35,10 +35,17 @@ class Classifier:
         #print(f"num_pieces: {b} rangos: {a} - {b}")
         y1, y2, x1, x2 = coordenadas
         h = y2 - y1
+        imagen_next= None
         for i in range(a, b + 1):
             imagen_next = img[y1 + int(h * ((i - 1) / 5)) :
                     y1 + int(h * ((i) / 5))
                     , x1:x2]
+            # if a==5 and b==5:
+            #     imagen_next = img[y1 + int(h * ((i - 1) / 5)) :
+            #         y1 + int(h * ((i) / 5) -(h* 0.05))
+            #         , x1:x2]
+            #     cv2.imshow("Imagen Next", imagen_next)
+            #     cv2.waitKey(0)
 
             pieces.append(self.predict_piece(imagen_next))
 
