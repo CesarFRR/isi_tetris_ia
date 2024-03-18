@@ -1,5 +1,6 @@
 from ast import List
 import os
+from cv2 import add
 import numpy as np
 from model.Pieces import Piece
 
@@ -11,6 +12,7 @@ class Grid:
         initial_height = min(np.max(self.h_pieces) + 4, self.max_height)
         ##print('initial_height:',initial_height , self.h_pieces, np.min(self.h_pieces))
         self.grid = np.zeros((initial_height, self.width), dtype=np.int8) if grid is None else grid
+        self.grid = np.zeros((20, self.width), dtype=np.int8)
         # self.print_shape()
     def __str__(self) -> str:
         return str(self.grid)
@@ -21,8 +23,17 @@ class Grid:
             self.grid = np.concatenate((new_rows, self.grid), axis=0)
 
 
-    def update_h_pieces(self):
-        #print('current h_pieces: \n', self.h_pieces, '\n', self.grid)
+    def update_h_pieces(self, add_zero_rows=True):
+        # Verifica cuántas filas de ceros hay desde la fila 0 hacia abajo
+        zero_rows = np.all(self.grid == 0, axis=1)
+        num_zero_rows = np.sum(zero_rows)
+
+        # Si hay más de 4 filas de ceros, quita filas de ceros hasta que haya 4
+        # Si hay más de 4 filas de ceros, quita filas de ceros hasta que haya 4
+        # if add_zero_rows and num_zero_rows > 4:
+        #     rows_to_remove = num_zero_rows - 4
+        #     self.grid = np.delete(self.grid, slice(0, rows_to_remove), axis=0)  # Elimina las filas superiores
+        #     self.grid = np.vstack([self.grid, np.zeros((rows_to_remove, self.grid.shape[1]))])  # Añade filas de ceros en la parte inferior
 
         # Actualiza h_pieces para cada columna
         for col in range(self.width):
@@ -30,16 +41,17 @@ class Grid:
             if np.all(self.grid[:, col] == 0):
                 self.h_pieces[col] = 0
             else:
-               # De lo contrario, la altura es la fila del primer 1 desde abajo
-                self.h_pieces[col] = self.grid.shape[0] - np.argmax(self.grid[:, col] == 1)
-
-        # Verifica cuántas filas de ceros hay desde la fila 0 hacia abajo
-        zero_rows = np.all(self.grid == 0, axis=1)
-        num_zero_rows = np.sum(zero_rows)
+                for i in range(self.grid.shape[0]):
+                    # De lo contrario, la altura es la fila del primer 1 desde abajo
+                    if self.grid[i, col] == 1:
+                        #print('i:', i, 'col:', col, 'grid shape:', self.grid.shape)
+                        self.h_pieces[col] = self.grid.shape[0] - i
+                        break
 
         # Si hay menos de 4 filas de ceros, agrega filas de ceros hasta que haya 4
-        if num_zero_rows < 4:
-            self.add_rows(4 - num_zero_rows)
+        # if add_zero_rows:
+        #     if num_zero_rows < 4:
+        #         self.add_rows(4 - num_zero_rows)
        # print('after h_pieces: \n', self.h_pieces, '\n', self.grid)
 
     def get_h_pieces(self):
@@ -181,7 +193,17 @@ class Grid:
     def find_h_piece_sum(self, indices=None)-> int:
         # devuelve la suma de las alturas de las columnas
         if indices is None:
-            return np.sum(self.h_pieces)
+            # Actualiza h_pieces para cada columna
+            h_p= np.zeros(self.width, dtype=np.int8)
+            for col in range(self.width):
+                #Si la columna está vacía (todos ceros), la altura es 0
+                if np.all(self.grid[:, col] == 0):
+                    h_p[col] = 0
+                else:
+                # De lo contrario, la altura es la fila del primer 1 desde abajo
+                    h_p[col] = self.grid.shape[0] - np.argmax(self.grid[:, col] == 1)
+            return np.sum(h_p)
+
         return np.sum(self.h_pieces) + len(indices)
     
     
@@ -220,10 +242,12 @@ class Grid:
             for j in range(piece.get_optimized_current_matrix().shape[1]):
                 if piece.get_optimized_current_matrix()[i, j] == 1:
                     indices.add((row+i, col+j))
-        print('\n===================\nindices de la pieza antes del while: ', indices, '\n===================\n')
+        #print('\n===================\nindices de la pieza antes del while: ', indices, '\n===================\n')
         if not any((i+1 < self.grid.shape[0] and self.grid[i+1, j] == 1) for i, j in indices):
-            print('\nhay que bajar los indices\n')
+            #print('\nhay que bajar los indices\n')
+            pass
         while True:
+            #print('while 4 get indexes')
             # Comprueba si la pieza puede moverse hacia abajo
             if any((i+1 < self.grid.shape[0] and self.grid[i+1, j] == 1) or (i+1 == self.grid.shape[0]) for i, j in indices):
                 break
@@ -231,7 +255,7 @@ class Grid:
             # Mueve la pieza hacia abajo
             indices = [(i+1, j) for i, j in indices]
 
-        print('\n===================\nindices de la pieza: ', indices, '\n===================\n')
+        #print('\n===================\nindices de la pieza: ', indices, '\n===================\n')
         return indices
 
 
@@ -291,8 +315,16 @@ class Grid:
         #print('grid con la pieza colocada:', self.grid)
         H = (a*self.find_h_piece_sum(indices), b*len(self.find_full_rows(indices)),
               c*self.find_holes(indices), d*self.find_gaps())
+        
+        self.__place_piece(indices=indices)
+        self.update_h_pieces(add_zero_rows=False)
+        #print(f'place piece: \n', self.grid)
         H_0 = (a*self.find_h_piece_sum(), b*len(self.find_full_rows()),
               c*self.find_holes(), d*self.find_gaps())
+        self.unplace_piece(indices=indices, update_h_pieces=False)
+        self.update_h_pieces(add_zero_rows=False)
+
+        H=H_0   
         #print(f'grid calculate_heuristics - {3}:\n', self.grid)
         # ===================================#
         #print('la suma da esto======: ', sum(H))
@@ -303,6 +335,8 @@ class Grid:
         #self.unplace_piece(indices, update_h_pieces=False)
         #self.update_h_pieces()
         #print(f'grid calculate_heuristics - {4}:\n', self.grid)
+        if indices ==  [(16, 8), (17, 8),(18, 8),(19, 8)]:
+            print('indices:', indices, 'H:', H, 'sum: ', sum(H), 'H_0:', H_0, 'sum_0:', sum(H_0))
         
         return H, indices, H_0
 

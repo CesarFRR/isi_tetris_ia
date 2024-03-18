@@ -94,18 +94,20 @@ def generate_actions(best_option, piece:model.Pieces.Piece, grid:Grid):
     # Mover la pieza a la izquierda o derecha
     #print("best_option: ", best_option, "piece.grid_position: ", piece.grid_position, "piece.current_shape: ", piece.current_shape)
     # Rotar la pieza
-    current = piece.current_shape
-    if best_option[2] != piece.current_shape:
-        current = piece.current_shape
-        while best_option[2] != current:
-            #print('current: ', current, 'best_option[2]: ', best_option[2])
-            actions.append("spin_right")
-            current = (current + 1) % 4
+    piece.set_current_shape(0)
+    
+    while best_option[2] != piece.current_shape:
         #print('current: ', current, 'best_option[2]: ', best_option[2])
-
+        
+        if best_option[2] > piece.current_shape:
+            actions.append("spin_right")
+            piece.spin_right()
+        #print('while 0')
+        #print('current: ', current, 'best_option[2]: ', best_option[2])
     if best_option[1] < piece.grid_position:
         grid_pos = piece.grid_position
         while best_option[1] != grid_pos:
+            #print('while 1')
             #print('grid_pos: ', grid_pos, 'best_option[1]: ', best_option[1])
             actions.append("move_left")
             grid_pos -= 1
@@ -114,6 +116,7 @@ def generate_actions(best_option, piece:model.Pieces.Piece, grid:Grid):
     elif best_option[1] > piece.grid_position:
         grid_pos = piece.grid_position
         while best_option[1] != grid_pos:
+            #print('while 2')
             #print('grid_pos: ', grid_pos, 'best_option[1]: ', best_option[1])
             actions.append("move_right")
             grid_pos += 1
@@ -189,7 +192,7 @@ def controls_test():
 
     time.sleep(9)
     print("COMENZANDO A JUGAR")
-    print("Desde aqui se empieza a juagar, los tiempos y el time de 7.5 son necesarios, no removerlos")
+    print("Desde aqui se empieza a juagar, los tiempos y el time de 9s son necesarios, no removerlos")
     print("=========================================")
     play= True
    # print("actions: ", actions)
@@ -205,25 +208,28 @@ def controls_test():
         piece = getattr(model.Pieces, current_piece)()
         #print_grid(3)
         best_choice= grid_m.get_best_choice(piece)
-        max_value_0, max_value_1, max_index, indices = best_choice
-        best_choice = (max_value_0, max_value_1, max_index)
+        score, pos, rotation= best_choice
+        best_choice = (score, pos, rotation)
         print("best choice: ", best_choice)
-        #actions do--> TODO
+        print('grid_m.grid: \n', grid_m.grid.grid)
         actions = generate_actions(best_choice, piece, grid_m.grid)
+        print("actions: ", actions)
+        time.sleep(2)
+        #actions do--> TODO
         #print("actions: ", actions)
         ctr.perform_actions(actions)
         #print_grid(5)
         #grid_m.place_piece (piece, best_choice[1], best_choice[2])
-        grid_m.grid.place_piece(indices=indices)
+        grid_m.place_piece(piece, pos, rotation)
         #print_grid(6)
         grid_m.update_grid()
         next_m.update()
         if ctr.check_game_over():
             play= False
             print(txt_game_over)
-        print('\nh_pieces:\n', grid_m.grid.h_pieces)
-        print_grid(99)
-        time.sleep(1)
+        #print('\nh_pieces:\n', grid_m.grid.h_pieces)
+        #print_grid(99)
+        time.sleep(0)
 
 
 
@@ -259,7 +265,7 @@ def controls_test():
 
 
 
-#controls_test()
+controls_test()
 # framer_test()
 
 # grid = [[0 for _ in range(10)] for _ in range(20)]
@@ -292,6 +298,7 @@ def controls_test():
 #     print_matrix(piece_L)
 
 
+#controls_test()
 
 
 
@@ -301,14 +308,32 @@ def controls_test():
 # #g1.print_shape()
 # #print('\n')
 
-# grid_test = np.array([
-#     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-#     [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-#     [0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
-#     [1, 1, 0, 1, 1, 1, 1, 0, 0, 0]
-# ])
+grid_test = np.array([
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 0, 1, 1, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 1]
+])
 # #print(grid_test)
-# h_pieces = np.zeros(grid_test.shape[1], dtype=np.int8)
+h_pieces = np.array([1, 1, 2, 2, 1, 2, 2, 1, 0, 1], dtype=np.int8)
+
+full_rows = 0
+holes = 0
+gaps = 6
+aggregate_height = 13
+
+print('=======================================')
+
+print('test grid')
+
+print('=======================================')
+
+print('h_pieces Grid class:')
+
+
+
 # for col in range(grid_test.shape[1]):
 #     h_pieces[col] = np.argmin(grid_test[::-1, col] == 1)
 
@@ -345,5 +370,3 @@ def controls_test():
 # print('a, b, c, d = ', os.getenv('H_A'), os.getenv('H_B'), os.getenv('H_C'), os.getenv('H_D'))
 
 
-
-controls_test()

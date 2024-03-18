@@ -223,7 +223,8 @@ class Controls:
             # Obtén el método con el nombre de acción y llámalo
             method = getattr(self, action)
             method()
-            time.sleep(0.1)
+            time.sleep(0.5)
+            
 
 # c1 = Controls()
 
