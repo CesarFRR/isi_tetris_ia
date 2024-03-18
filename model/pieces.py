@@ -122,6 +122,8 @@ legos = {
 
 
 class Piece:
+
+    
     current_shape = 0
     """Indica el shape actual que se esta utilizando, entiendase por shape al estado (en que está girado) actual de la pieza (matriz 2D)"""
     computable_shapes=1
