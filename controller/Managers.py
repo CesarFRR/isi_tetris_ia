@@ -1,5 +1,5 @@
-from calendar import c
 
+import re
 import cv2
 from model.Pieces import Piece
 from view.Classifier import Classifier
@@ -13,16 +13,47 @@ fr = Framer()
 class HoldManager:
     def __init__(self):
         self.hold = None
+        self.score = 0
+        self.position = None
+        self.rotation = None
+        self.indices = None
+        self.best_choice = None
+        self.ctr = None
+        self.grid_m=None
 
     def get_hold(self):
         return self.hold
     
-    def set_hold(self, hold):
+    def set_hold(self, hold, score=None):
         self.hold = hold
+        if score is not None:
+            self.score = score
 
+        return self
+    def get_score(self):
+        return self.score
+    def set_score(self, score):
+        self.score = score
+        return self
+    
     def remove_hold(self):
         self.hold = None
+
+    def swap(self, piece):
+        self.ctr.hold_move()
+        if self.hold is not None:
+            self.hold, piece = piece, self.hold
+            return piece
+        
+        self.hold = piece
+        return None
     
+    def update(self):
+        self.best_choice = self.grid_m.get_best_choice(self.hold)
+        self.score, self.position, self.rotation, self.indices = self.best_choice
+        return self
+    
+
     def __str__(self):
         return self.hold
 
@@ -36,6 +67,7 @@ class NextManager:
         y1, y2, x1, x2 = self.coordenadas_next
         h = y2 - y1
         w = x2 - x1
+        self.popped_pieces = 0
        
 
 
@@ -43,27 +75,30 @@ class NextManager:
     def get_next_list(self):
         return self.next_list
     
-    def swap_hold(self, hold: HoldManager):
-        if hold.get_hold() is not None:
-            self.next_list[0], hold.hold = hold.get_hold(), self.next_list[0]
-        else:
-            hold.hold = self.next_list[0]
-            self.next_list.pop(0)
-            self.update()
+    # def swap_hold(self, hold: HoldManager):
+    #     if hold.get_hold() is not None:
+    #         self.next_list[0], hold.hold = hold.get_hold(), self.next_list[0]
+    #     else:
+    #         hold.hold = self.next_list[0]
+    #         self.next_list.pop(0)
+    #         self.update()
     def pop_piece(self):
         new = self.next_list.pop(0)
-        self.update()
+        self.popped_pieces += 1
         return new
 
 
-    def update(self):
+    def update(self, range = [5, 5]):
         """Actualiza la lista de Next haciendo captura unicamente del sector de la nueva pieza (la quinta) y clasificandola."""
         # img = self.ss.capture()
         # cv2.imshow('next', img[self.coordenadas_next[0]:self.coordenadas_next[1], self.coordenadas_next[2]:self.coordenadas_next[3]])
         # cv2.waitKey(0)
-        self.next_list.append(self.cls.predict_pieces(self.ss.capture(), [5, 5], self.coordenadas_next)[0])
-        if len(self.next_list) > 5:
-            self.next_list.pop(0)
+        news= self.cls.predict_pieces(self.ss.capture(), range, self.coordenadas_next)
+        
+
+        self.next_list= self.next_list + news
+        # if len(self.next_list) > 5:
+        #     self.next_list.pop(0)
         return self
     
     def __str__(self) -> str:

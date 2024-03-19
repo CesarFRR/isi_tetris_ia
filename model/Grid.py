@@ -13,6 +13,7 @@ class Grid:
         ##print('initial_height:',initial_height , self.h_pieces, np.min(self.h_pieces))
         self.grid = np.zeros((initial_height, self.width), dtype=np.int8) if grid is None else grid
         self.grid = np.zeros((20, self.width), dtype=np.int8)
+        self.full_rows_removed=0
         # self.print_shape()
     def __str__(self) -> str:
         return str(self.grid)
@@ -95,7 +96,7 @@ class Grid:
     #     w_piece = p.shape[0] if p.ndim == 1 else p.shape[1]
 
     #    return self.width - (w_piece -1)
-    def remove_full_rows(self, update_h_pieces=True):
+    def remove_full_rows(self, update_h_pieces=True, count=False):
         # Usa get_full_rows para encontrar las filas llenas
         full_rows = self.find_full_rows()
 
@@ -112,9 +113,11 @@ class Grid:
         # Actualiza h_pieces
         if update_h_pieces:
             self.update_h_pieces()
+
+        if count: self.full_rows_removed += num_full_rows
             
     def update_grid(self):
-        self.remove_full_rows()
+        self.remove_full_rows(count=True)
         self.update_h_pieces()
         
 

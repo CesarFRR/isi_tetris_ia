@@ -100,6 +100,16 @@ def generate_actions(best_option, piece:model.Pieces.Piece, grid:Grid):
         #print('current: ', current, 'best_option[2]: ', best_option[2])
         
         if best_option[2] > piece.current_shape:
+
+            if best_option[2] ==2:
+                actions.append("spin_180")
+                piece.set_current_shape(2)
+                break
+            if best_option[2] == 3:
+                actions.append("spin_left")
+                piece.set_current_shape(3)
+                break
+
             actions.append("spin_right")
             piece.spin_right()
         #print('while 0')
@@ -161,6 +171,8 @@ def controls_test():
     fr.encontrar_bordes_centrales()
 
     next_m, grid_m, hold_m = NextManager(img_0, fr.obtener_next()), GridManager(), HoldManager()
+    hold_m.grid_m = grid_m
+    hold_m.ctr = ctr
     def print_grid(grid):
         for row in grid:
             for col in row:
@@ -185,27 +197,47 @@ def controls_test():
 
     # print("sleep de 10 superado!")
     # print('next list: ', next_m.get_next_list())
-    
+    status = {"Used Pieces: ":0, "remaining holes: ":0, 'remaining height: ':0, "full rows: ":0}
 
-    time.sleep(9)
+    time.sleep(8.5)
     print("COMENZANDO A JUGAR")
     print("Desde aqui se empieza a jugar, los tiempos y el time de 9s son necesarios, no removerlos")
     print("=========================================")
+    # time.sleep(0.5)
     play= True
+    win = False
+    print('next list: ', next_m.get_next_list())
+
     current_piece = next_m.pop_piece()
+    current_piece_2 = next_m.pop_piece()
+    piece = getattr(model.Pieces, current_piece)()
+    hold_m.swap(piece)
+    hold_m.update()
+    
+    next_m.update([4, 5])
+    print('next list + (4,5): ', next_m.get_next_list())
+    
+    current_piece = current_piece_2
     print('POP!!!##=====>', current_piece)
     print("current_piece: ", current_piece)
-
+    
     piece = getattr(model.Pieces, current_piece)()
     #print("piece: ", piece, type(piece))
     best_choice= grid_m.get_best_choice(piece)
+    score, pos, rotation, indices= best_choice
     print("best choice: ", best_choice)
     actions = generate_actions(best_choice, piece, grid_m.grid)
    # print("actions: ", actions)
-    # ctr.perform_actions(actions)
-    # grid_m.place_piece(piece, best_choice[1], best_choice[2])
-    # grid_m.update_grid()
-    # next_m.update()
+    ctr.perform_actions(actions)
+    grid_m.place_piece(piece, best_choice[1], best_choice[2])
+    grid_m.update_grid()
+    #time.sleep(0.1)
+    next_m.update()
+    view_grid = np.array(grid_m.grid.grid.copy(), dtype=object)
+    for r, c in indices:
+        view_grid[r, c] = 'X'
+    print('grid_m.grid: \n')
+    print_grid(view_grid)
     #print_grid(0)
     while(play):
         #print_grid(2)
@@ -220,6 +252,19 @@ def controls_test():
         score, pos, rotation, indices= best_choice
         best_choice = (score, pos, rotation)
         print("best choice: ", best_choice)
+
+        if hold_m.get_score() > best_choice[0]:
+            print("swapping")
+            piece = hold_m.swap(piece)
+            
+            best_choice= hold_m.best_choice
+            score, pos, rotation, indices= best_choice
+            best_choice = (score, pos, rotation)
+            print("best choice: ", best_choice)
+
+
+
+
         actions = generate_actions(best_choice, piece, grid_m.grid)
         print("actions: ", actions)
         #time.sleep(2)
@@ -231,18 +276,33 @@ def controls_test():
         grid_m.place_piece(piece, pos, rotation)
         #print_grid(6)
         grid_m.update_grid()
+        hold_m.update()
+        next_m.update()
         view_grid = np.array(grid_m.grid.grid.copy(), dtype=object)
         for r, c in indices:
             view_grid[r, c] = 'X'
         print('grid_m.grid: \n')
         print_grid(view_grid)
+        #time.sleep(0.1)
+        if ctr.check_you_win():
+            play= False
+            win = True
+            print(txt_you_win)
+            break
+
         if ctr.check_game_over():
             play= False
             print(txt_game_over)
+            break
         #print('\nh_pieces:\n', grid_m.grid.h_pieces)
         #print_grid(99)
-        time.sleep(0)
-
+        #time.sleep(0)
+    if win:
+        status["Used Pieces: "] = next_m.popped_pieces
+        status["remaining holes: "] = grid_m.grid.find_holes()
+        status['remaining height: '] = grid_m.grid.find_h_piece_sum()
+        status["full rows: "] = grid_m.grid.full_rows_removed
+        print(status)
 
 
 

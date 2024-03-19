@@ -115,6 +115,18 @@ class Controls:
         except Exception:
             return False
         
+    def check_you_win(self):
+        try:
+            you_win = self.driver.find_element(By.ID, "result_header")
+            # Verifica si el elemento está visible
+            if you_win.is_displayed():
+                # Si el elemento aparece y está visible, establece play en False
+                return True
+            else:
+                return False
+        except Exception:
+            return False
+        
     def login(self):
         # Localiza el elemento con el ID 'entry_username'
         
@@ -223,7 +235,7 @@ class Controls:
             # Obtén el método con el nombre de acción y llámalo
             method = getattr(self, action)
             method()
-            #time.sleep(0.5)
+            # time.sleep(0.5)
             
 
 # c1 = Controls()

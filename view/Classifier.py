@@ -5,6 +5,7 @@ import os
 
 class Classifier:
     def __init__(self):
+        self.count=0
         self.legos = [
             os.path.splitext(file)[0]
             for file in os.listdir("data/legos")
@@ -25,7 +26,9 @@ class Classifier:
     ) -> list[str]:
         # Carga la imagen
         img = image
-        # cv2.imshow("Imagen Next_hla", img)
+       # cv2.imwrite(f"./data/tests/next_test/n{self.count}.jpg", img[coordenadas[0]:coordenadas[1], coordenadas[2]:coordenadas[3]])
+        self.count+=1
+
         # cv2.waitKey(0)
         if isinstance(image, str):
             img = cv2.imread(image)
@@ -41,7 +44,8 @@ class Classifier:
                     y1 + int(h * ((i) / 5))
                     , x1:x2]
             # if a==5 and b==5:
-            #     imagen_next = img[y1 + int(h * ((i - 1) / 5)) :
+            #     cv2.imwrite(f"./data/tests/next_test/n_h{self.count}.jpg", imagen_next)
+                
             #         y1 + int(h * ((i) / 5) -(h* 0.05))
             #         , x1:x2]
             #     cv2.imshow("Imagen Next", imagen_next)
