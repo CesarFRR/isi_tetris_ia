@@ -44,6 +44,7 @@ To use the Tetris agent, follow these steps:
 - [cv2](https://pypi.org/project/opencv-python/)
 - [Selenium](https://pypi.org/project/selenium/)
 - [Python Dotenv](https://pypi.org/project/python-dotenv/)
+- [WebDriver Manager](https://pypi.org/project/webdriver-manager/)
 
 Using python 3.11.5 (64-bit) | March 2024
 
