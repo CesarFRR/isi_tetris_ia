@@ -21,6 +21,7 @@ class Tetris_IA:
         max_index = -1
         max_indices = None
         for i in range(len(h_list)):
+            
             current, indices= self.grid.calculate_heuristics(piece, i)
             current = sum(current)
 

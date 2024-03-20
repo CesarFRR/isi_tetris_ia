@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class MainController:
-    
+
     def __init__(self) -> None:
         pass
 
@@ -20,15 +20,6 @@ class MainController:
         ctr = Controls(OS=platform.system())
         
         ss = ScreenShot()
-        # time.sleep(7)
-
-        # c1.drop_hard()
-        # c1.hold_move()
-        
-        # c1.spin_left()
-
-        # print("teclas presionadas")
-        # time.sleep(7)
 
         ctr.login()
         time.sleep(1)

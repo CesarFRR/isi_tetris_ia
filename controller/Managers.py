@@ -73,13 +73,7 @@ class NextManager:
     def get_next_list(self):
         return self.next_list
     
-    # def swap_hold(self, hold: HoldManager):
-    #     if hold.get_hold() is not None:
-    #         self.next_list[0], hold.hold = hold.get_hold(), self.next_list[0]
-    #     else:
-    #         hold.hold = self.next_list[0]
-    #         self.next_list.pop(0)
-    #         self.update()
+  
     def pop_piece(self):
         new = self.next_list.pop(0)
         self.popped_pieces += 1
@@ -88,15 +82,12 @@ class NextManager:
 
     def update(self, range = [5, 5]):
         """Actualiza la lista de Next haciendo captura unicamente del sector de la nueva pieza (la quinta) y clasificandola."""
-        # img = self.ss.capture()
-        # cv2.imshow('next', img[self.coordenadas_next[0]:self.coordenadas_next[1], self.coordenadas_next[2]:self.coordenadas_next[3]])
-        # cv2.waitKey(0)
+       
         news= self.cls.predict_pieces(self.ss.capture(), range, self.coordenadas_next)
         
 
         self.next_list= self.next_list + news
-        # if len(self.next_list) > 5:
-        #     self.next_list.pop(0)
+       
         return self
     
     def __str__(self) -> str:
@@ -123,13 +114,13 @@ class GridManager:
     def place_piece(self, piece:Piece, column:int, rotation:int):
         """Coloca la pieza en la columna y rotacion dada"""
         self.grid.place_piece_final(piece, column, rotation)
-        #print('\ngrid despues de poner pieza:\n', self.grid)
+        
         
        
     def update_grid(self):
         """Actualiza el grid, eliminando las filas completas y actualizando las heuristicas"""
         self.grid.update_grid()
-        #print('\ngrid despues de actaulizarse:\n', self.grid)
+       
 
         
 

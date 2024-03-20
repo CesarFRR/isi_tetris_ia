@@ -294,6 +294,7 @@ class Red_Z(Piece):
         self.optimized_current_shape = self.trim_zeros()
         
     def __str__(self):
+        
         return super().__str__(class_name=self.__class__.__name__)
 
 

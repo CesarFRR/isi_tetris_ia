@@ -78,6 +78,7 @@ class Controls:
         time.sleep(1)
 
     def get_browser(self):
+        
         driver = None
         if self.OS == 'Linux' and not self.browser_name:
             options = webdriver.FirefoxOptions()

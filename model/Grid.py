@@ -282,7 +282,7 @@ class Grid:
         indices = self.get_piece_indexes(piece, index)
         self.__place_piece(indices)
         
-        #print('place piece final, grid: ', self.grid)
+       
         
     
         

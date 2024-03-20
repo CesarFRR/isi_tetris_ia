@@ -33,6 +33,7 @@ class Framer:
         return self.last_bordes_centrales
 
     def obtener_next(self, bordes=None, imagen = None):
+        
         if imagen is None:
             imagen = self.imagen
         if bordes is None:

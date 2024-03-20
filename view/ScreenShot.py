@@ -5,6 +5,7 @@ import cv2
 import os
 class ScreenShot:
     def __init__(self):
+        
         self.sct = mss.mss()
         self.w, self.h = self.sct.monitors[1]['width'], self.sct.monitors[1]['height']
         self.margen_w = self.w // 5

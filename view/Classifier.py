@@ -14,6 +14,7 @@ class Classifier:
         self.histograms = []
 
         for name in self.legos:
+            
             img = cv2.imread(f"data/legos/{name}.jpg")
             hist = cv2.calcHist(
                 [img], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256]
