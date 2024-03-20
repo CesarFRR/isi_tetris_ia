@@ -1,6 +1,4 @@
 
-import re
-import cv2
 from model.Pieces import Piece
 from view.Classifier import Classifier
 from view.Framer import Framer
@@ -11,15 +9,15 @@ fr = Framer()
 
 
 class HoldManager:
-    def __init__(self):
+    def __init__(self, ctr, ia=None):
         self.hold = None
         self.score = 0
         self.position = None
         self.rotation = None
         self.indices = None
         self.best_choice = None
-        self.ctr = None
-        self.grid_m=None
+        self.ctr = ctr
+        self.ia=ia
 
     def get_hold(self):
         return self.hold
@@ -49,7 +47,7 @@ class HoldManager:
         return None
     
     def update(self):
-        self.best_choice = self.grid_m.get_best_choice(self.hold)
+        self.best_choice = self.ia.get_best_choice(self.hold)
         self.score, self.position, self.rotation, self.indices = self.best_choice
         return self
     
@@ -122,72 +120,6 @@ class GridManager:
             print(row)
         print("\n")
 
-    def compute_piece(self, piece:Piece):
-        """Calcula todas las heuristicas de la pieza para cada columna de grid, sin rotar la pieza"""
-        ##print('AQUI ES LA PIEZA: \n', piece.get_optimized_current_matrix(), '\n', piece.get_optimized_current_matrix().shape,'\n')
-        #print('alturas de la grilla: \n', self.grid.h_pieces)
-        h_list = np.array([float for i in range(11-piece.get_optimized_current_matrix().shape[1])], dtype=object)
-        max_value = float('-inf')
-        max_index = -1
-        max_value_0 = float('-inf')
-        max_index_0 = -1
-        #print(f'grid compute_piece - {0}: \n', self.grid.grid)
-        #print('pieza actual:\n', piece.get_optimized_current_matrix())
-        indices = None
-        max_indices = None
-        for i in range(len(h_list)):
-            current, indices, current_0 = self.grid.calculate_heuristics(piece, i)
-            current = sum(current)
-            current_0 = sum(current_0)
-            h_list[i]= current
-            ###print('heurisrica de i:', i, h_list[i], '\npara la pieza:', piece.get_optimized_current_matrix())
-            
-            if current > max_value:
-                max_value = current
-                max_index = i
-                max_indices = indices
-            if current_0 > max_value_0:
-                max_value_0 = current_0
-                max_index_0 = i
-            
-        #print(f'grid compute_piece - {1}: \n', self.grid.grid)
-        #print('AQUI ES LAS HEURISTICAS: \n', h_list)
-        return (max_value, max_index,max_indices)
-    
-    def compute_piece_all_rotations(self, piece:Piece):
-        """Calcula todas las heuristicas de la pieza para cada columna de grid, rotando la pieza"""
-        h_list_all = np.array( [np.array for _ in range(piece.computable_shapes)], dtype=object)
-       # print(f'grid compute_piece_all_rotations - {0}: \n', self.grid.grid)
-        for i in range(len(h_list_all)):
-            piece.set_current_shape(i)
-            max_v, max_i, max_indices = self.compute_piece(piece)
-            h_list_all[i]=(max_v, max_i, max_indices)
-            
-            ###print('heurisricas de i:', i, h_list_all[i], '\npara la matrix de la pieca:', piece.get_optimized_current_matrix(), '\nNumero: ', piece.current_shape, '\n')
-        
-        ##print('\nHeuristicas de todas las rotaciones!!: \n', h_list_all)
-        
-        #print(f'grid compute_piece_all_rotations - {1}: \n', self.grid.grid)
-        piece.set_current_shape(0)
-       # print(f'grid compute_piece_all_rotations - {2}: \n', self.grid.grid)
-        return h_list_all
-    
-    def get_best_choice(self, piece:Piece):
-        """Calcula la mejor columna para la pieza actual.
-
-        returns: (max_value, max_index, max_rotation)
-        
-        max_value: el valor maximo de la heuristica
-        max_index: la columna donde se encuentra el valor maximo
-        max_rotation: la rotacion que tiene la pieza con la que se obtuvo el valor maximo"""
-        #print('GRID ANTES DEL BEST CHOICE: \n', self.grid.grid)
-        h_list= self.compute_piece_all_rotations(piece)
-        max_index, max_value = max(enumerate(h_list), key=lambda x: x[1][0])
-        #print('max_value:', max_value, 'max_index:', max_index)
-        #print('GRID DESPUES DEL BEST CHOICE: \n', self.grid.grid)
-        print('best_choice:',(max_value[0], max_value[1], max_index))
-        return (max_value[0], max_value[1], max_index, max_value[2])
-    
     def place_piece(self, piece:Piece, column:int, rotation:int):
         """Coloca la pieza en la columna y rotacion dada"""
         self.grid.place_piece_final(piece, column, rotation)
@@ -198,6 +130,25 @@ class GridManager:
         """Actualiza el grid, eliminando las filas completas y actualizando las heuristicas"""
         self.grid.update_grid()
         #print('\ngrid despues de actaulizarse:\n', self.grid)
+
+        
+
+
+    def print_grid(self, indices=None):
+        """Muestra el grid con la pieza actual"""
+        if indices is None:
+
+            view_grid = np.array(self.grid.grid.copy(), dtype=object)
+            for r, c in indices:
+                view_grid[r, c] = 'X'
+        else:
+            view_grid = self.grid.grid
+        print('grid_m.grid: \n')
+        for row in view_grid:
+            for col in row:
+                print(col, end=" ")
+            print()
+        
 
       
   

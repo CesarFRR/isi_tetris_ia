@@ -223,7 +223,9 @@ class Piece:
         self.optimized_current_shape = self.trim_zeros()
         return self
 
-    def __str__(self, i=None):
+    def __str__(self, i=None, class_name=None):
+        if class_name is not None:
+            return " " + class_name + "\n"
         shape_str = (
             str(self.__get_i_shape(self.current_shape if i == None else i))
             if len(self.shapes) > 0
@@ -241,6 +243,8 @@ class Cian_l(Piece):
         self.computable_shapes=2
         """Indica cuales shapes son necesarios para cada calculo de estados en la busqueda, es decir que los demás shapes son redundantes y no necesarios para el calculo."""
         self.optimized_current_shape = self.trim_zeros()
+    def __str__(self):
+        return super().__str__(class_name=self.__class__.__name__)
     
 
 class Fucsia_T(Piece):
@@ -249,7 +253,8 @@ class Fucsia_T(Piece):
         self.computable_shapes=4
         """Indica cuales shapes son necesarios para cada calculo de estados en la busqueda, es decir que los demás shapes son redundantes y no necesarios para el calculo."""
         self.optimized_current_shape = self.trim_zeros()
-        
+    def __str__(self):
+        return super().__str__(class_name=self.__class__.__name__)
         
 
 class Green_S(Piece):
@@ -258,13 +263,18 @@ class Green_S(Piece):
         self.computable_shapes=2
         """Indica cuales shapes son necesarios para cada calculo de estados en la busqueda, es decir que los demás shapes son redundantes y no necesarios para el calculo."""
         self.optimized_current_shape = self.trim_zeros()
-
+    def __str__(self):
+        return super().__str__(class_name=self.__class__.__name__)
+    
 class Orange_L(Piece):
     def __init__(self):
         self.shapes = legos[self.__class__.__name__].copy()
         self.computable_shapes=4
         """Indica cuales shapes son necesarios para cada calculo de estados en la busqueda, es decir que los demás shapes son redundantes y no necesarios para el calculo."""
         self.optimized_current_shape = self.trim_zeros()
+
+    def __str__(self):
+        return super().__str__(class_name=self.__class__.__name__)
 
 class Purple_L(Piece):
     def __init__(self):
@@ -273,6 +283,9 @@ class Purple_L(Piece):
         """Indica cuales shapes son necesarios para cada calculo de estados en la busqueda, es decir que los demás shapes son redundantes y no necesarios para el calculo."""
         self.optimized_current_shape = self.trim_zeros()
 
+    def __str__(self):
+        return super().__str__(class_name=self.__class__.__name__)
+
 class Red_Z(Piece):
     def __init__(self):
         self.shapes = legos[self.__class__.__name__].copy()
@@ -280,6 +293,8 @@ class Red_Z(Piece):
         """Indica cuales shapes son necesarios para cada calculo de estados en la busqueda, es decir que los demás shapes son redundantes y no necesarios para el calculo."""
         self.optimized_current_shape = self.trim_zeros()
         
+    def __str__(self):
+        return super().__str__(class_name=self.__class__.__name__)
 
 
 class Yellow_sq(Piece):
@@ -290,6 +305,8 @@ class Yellow_sq(Piece):
         self.optimized_current_shape = self.trim_zeros()
         self.grid_position = 4
 
+    def __str__(self):
+        return super().__str__(class_name=self.__class__.__name__)
 
 
 

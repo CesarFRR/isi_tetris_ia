@@ -5,9 +5,19 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
+
+from model.Pieces import Piece
 import time
 import os
 
+options = webdriver.ChromeOptions()
+options.add_argument('--log-level=3')  # Esto ajusta el nivel de registro a ERROR
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 
 JS_DROP_FILE = """
@@ -42,48 +52,59 @@ Nota: Es el único método que funciona para arrastrar y soltar archivos del equ
 
 
 class Controls:
-    def __init__(self, url = 'https://tetr.io/'):
+    def __init__(self, url = 'https://tetr.io/', OS = 'Windows'):
         # Inicializa el self.driver del navegador (en este caso, Chrome)
         self.url = url
+        self.OS = OS
         self.browser_time = os.getenv('BROWSER_TIME_LOADING')
         # Inicializa el self.driver de Selenium correspondiente
         self.browser_name = os.getenv('BROWSER')
         self.driver = self.get_browser()
-        #print('\nBROWSER:',self.browser_name)
-        # Maximiza la ventana del navegador
         self.driver.maximize_window()
 
         # Navega a la página web
         self.driver.execute_script(F"document.body.style.zoom='80%'")
-
         self.driver.get('https://tetr.io/')
-
         # Espera n segundos
         time.sleep(int(self.browser_time))
-        #print("aplicando zoom con script")
         zoom = os.getenv('BROWSER_ZOOM')
         # Ejecuta un script JavaScript para ajustar el nivel de zoom al 70%
         self.driver.execute_script(F"document.body.style.zoom='{zoom if zoom is not None else 100}%'")
-
-        # Imprime un mensaje
-        #print("Zoom aplicado al 70%")
-        
         # Ejecuta un script JavaScript para obtener el nivel de zoom actual
         zoom_level = self.driver.execute_script("return document.body.style.zoom")
 
         # Imprime el nivel de zoom
-        #print(f"Nivel de zoom: {zoom_level}")
+        print(f"Nivel de zoom: {zoom_level}")
         time.sleep(1)
 
     def get_browser(self):
-
         driver = None
+        if self.OS == 'Linux' and not self.browser_name:
+            options = webdriver.FirefoxOptions()
+            options.add_argument('--private')
+            # Ajusta el nivel de registro a ERROR para Firefox
+            options.log.level = 'error'
+            driver = webdriver.Firefox(options=options)
+            return webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
+        if self.OS == 'Windows' and not self.browser_name:
+            options = webdriver.EdgeOptions()
+            options.add_argument('--incognito')
+            options.add_argument('--log-level=3')  # Ajusta el nivel de registro a ERROR para Edge
+
+            driver = webdriver.Edge(service=Service(EdgeChromiumDriverManager().install()), options=options)
+            return driver
+
+
         if self.browser_name == 'EDGE':
             options = webdriver.EdgeOptions()
             options.add_argument('--incognito')
-            driver = webdriver.Edge(options=options)
+            options.add_argument('--log-level=3')  # Ajusta el nivel de registro a ERROR para Edge
+
+            driver = webdriver.Edge(service=Service(EdgeChromiumDriverManager().install()), options=options)
         elif self.browser_name == 'CHROME':
-            driver = webdriver.Chrome()
+            options = webdriver.ChromeOptions()
+            options.add_argument('--log-level=3')  # Ajusta el nivel de registro a ERROR para Chrome
+            return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
         elif self.browser_name == 'FIREFOX':
             driver = webdriver.Firefox()
         elif self.browser_name == 'INTERNET_EXPLORER':
@@ -99,8 +120,8 @@ class Controls:
                 driver_version = cv
                 driver = webdriver.Chrome(service=Service(ChromeDriverManager(driver_version).install()), options=options)
             else:
-                #print(f'Browser "{self.browser_name}" no soportado, iniciando con Edge por defecto.')
-                driver = webdriver.Edge()
+                options.add_argument('--log-level=3')  # Ajusta el nivel de registro a ERROR para Edge
+                driver = webdriver.Edge(service=Service(EdgeChromiumDriverManager().install()), options=options)
         return driver
     
     def check_game_over(self):
@@ -134,7 +155,7 @@ class Controls:
             EC.element_to_be_clickable((By.ID, 'entry_username'))
         )
 
-        # Introduce 'cesar12321' y presiona ENTER
+        # Introduce 'CESAR12345' y presiona ENTER
         username_input.send_keys('CESAR12345' + Keys.ENTER)
 
         # Espera a que aparezca el elemento con el ID 'askregister_anon'
@@ -144,7 +165,6 @@ class Controls:
 
         # Hace clic en el elemento con el ID 'askregister_anon' utilizando JavaScript
         self.driver.execute_script("arguments[0].click();", register_button)
-        #print('DIRECORIO ACTUAL--->\n\n\n',os.getcwd())
         time.sleep(1)
 
     def drag_and_drop_file(self, drop_target, path):
@@ -181,7 +201,6 @@ class Controls:
         # Espera hasta que aparezca el div con id 'start_40l' y haz clic en él
         start_40l_button = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'start_40l')))
         self.driver.execute_script("arguments[0].click();", start_40l_button)
-        #print("play 40 lines !!")
         
         self.focus()
         time.sleep(1.5)
@@ -191,8 +210,6 @@ class Controls:
         # Espera hasta que aparezca el elemento con id 'nofocus'
         self.driver.find_element(By.TAG_NAME, 'body').send_keys('f')
         
-        #print("focus!!")
-
     def drop_hard(self):
         # Presiona la tecla Space para realizar una caída rápida
         self.driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.SPACE)
@@ -236,26 +253,41 @@ class Controls:
             method = getattr(self, action)
             method()
             # time.sleep(0.5)
-            
 
-# c1 = Controls()
+    def generate_actions(self, best_option, piece: Piece):
+        """Genera las acciones necesarias para mover la pieza a la mejor opción."""
+        actions = []
+        piece.set_current_shape(0)
+        
+        # Rotaciones
+        while best_option[2] != piece.current_shape:
 
+            if best_option[2] > piece.current_shape:
 
-# # time.sleep(7)
+                if best_option[2] ==2:
+                    actions.append("spin_180")
+                    piece.set_current_shape(2)
+                    break
+                if best_option[2] == 3:
+                    actions.append("spin_left")
+                    piece.set_current_shape(3)
+                    break
 
-# # c1.drop_hard()
-# # c1.hold_move()
-# # c1.spin_180()
-# # c1.spin_left()
+                actions.append("spin_right")
+                piece.spin_right()
 
-# # #print("teclas presionadas")
-# # time.sleep(7)
+        # Movimientos laterales
+        if best_option[1] < piece.grid_position:
+            grid_pos = piece.grid_position
+            while best_option[1] != grid_pos:
+                actions.append("move_left")
+                grid_pos -= 1
 
-
-# c1.login()
-# time.sleep(1)
-
-# c1.play_40_l()
-# #print("login!!")
-
-# # time.sleep(7)
+        elif best_option[1] > piece.grid_position:
+            grid_pos = piece.grid_position
+            while best_option[1] != grid_pos:
+                actions.append("move_right")
+                grid_pos += 1
+        # Bajar la pieza
+        actions.append("drop_hard")
+        return actions

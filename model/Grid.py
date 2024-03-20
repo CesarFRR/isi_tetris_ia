@@ -294,54 +294,23 @@ class Grid:
             self.update_h_pieces()
 
     def calculate_heuristics(self, piece:Piece, index=0)-> tuple:
-        ##print('calculate_heuristics: indice:', index, '\npiece:', piece.get_matrix(), '\nh_pieces:', self.h_pieces, '\ngrid:', self.grid, '\nshape:', self.grid.shape, '\nwidth:', self.width, '\nmax_height:', self.max_height, '\nindex: ', index)
-        #print(f'grid calculate_heuristics - {0}:', self.grid)
+
         indices = self.get_piece_indexes(piece, index)
-       # print(f'grid calculate_heuristics - {1}:', self.grid)
-        #print(f'grid calculate_heuristics - {1.1}:', self.grid, '\n', self.h_pieces, '\n')
-        # self.place_piece(piece,index=index, update_h_pieces=False)
-        # ones_count = np.sum(piece.get_optimized_current_matrix() == 1, axis=0)
-        # self.update_h_pieces()
-        
-       # print('la pieza tiene: ', ones_count, ' unos, pieza: ', piece.get_optimized_current_matrix())
-       # print(f'grid calculate_heuristics - {1.2}:', self.grid, '\n', self.h_pieces, '\n')
-       # print(f'grid calculate_heuristics - {2}:', self.grid)
-        # aqui se calculan heristicas, 
-        # se puede devolver un diccionario.
-        # (aggregate_height, complete_lines, holes, gaps)
-        # if index==1:
-        #         print('index:', index, 'piece:', piece.get_optimized_current_matrix(), 'grid: ', self.grid)
+
         a= float(os.environ.get("H_A"))
         b= float(os.environ.get("H_B"))
         c= float(os.environ.get("H_C"))
         d= float(os.environ.get("H_D"))
-        #print('grid con la pieza colocada:', self.grid)
-        H = (a*self.find_h_piece_sum(indices), b*len(self.find_full_rows(indices)),
-              c*self.find_holes(indices), d*self.find_gaps())
+
         
         self.__place_piece(indices=indices)
         self.update_h_pieces(add_zero_rows=False)
-        #print(f'place piece: \n', self.grid)
-        H_0 = (a*self.find_h_piece_sum(), b*len(self.find_full_rows()),
+        H = (a*self.find_h_piece_sum(), b*len(self.find_full_rows()),
               c*self.find_holes(), d*self.find_gaps())
         self.unplace_piece(indices=indices, update_h_pieces=False)
         self.update_h_pieces(add_zero_rows=False)
-
-        H=H_0   
-        #print(f'grid calculate_heuristics - {3}:\n', self.grid)
-        # ===================================#
-        #print('la suma da esto======: ', sum(H))
-        # print('\nheuristica:\n', H)
-        # print('\nheuristica_0:\n', H_0)
-        # print('=======================')
-        # Quita la pieza de la cuadrícula
-        #self.unplace_piece(indices, update_h_pieces=False)
-        #self.update_h_pieces()
-        #print(f'grid calculate_heuristics - {4}:\n', self.grid)
-        if indices ==  [(16, 8), (17, 8),(18, 8),(19, 8)]:
-            print('indices:', indices, 'H:', H, 'sum: ', sum(H), 'H_0:', H_0, 'sum_0:', sum(H_0))
         
-        return H, indices, H_0
+        return H, indices
 
     def __place_piece(self, indices):
         """Coloca la pieza en la cuadrícula"""

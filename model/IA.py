@@ -1,127 +1,61 @@
-import heapq
-import heapq
-from Pieces import Piece
 
-class AStar:
-    def __init__(self, start, goal):
-        self.start = start
-        self.goal = goal
-        self.open_set = []
-        self.closed_set = set()
-        self.came_from = {}
-        self.g_score = {start: 0}
-        self.f_score = {start: self.heuristic(start)}
 
-    def run(self):
-        heapq.heappush(self.open_set, (self.f_score[self.start], self.start))
 
-        while self.open_set:
-            current = heapq.heappop(self.open_set)[1]
 
-            if current == self.goal:
-                return self.reconstruct_path(current)
+from controller.Managers import HoldManager, NextManager
+from model.Grid import Grid
+from model.Pieces import Piece
 
-            self.closed_set.add(current)
+import numpy as np
 
-            for neighbor in self.get_neighbors(current):
-                tentative_g_score = self.g_score[current] + self.distance(current, neighbor)
+class Tetris_IA:
+    def __init__(self, grid: Grid, hold_m: HoldManager, next_m: NextManager):
+        self.grid = grid
+        self.hold_m = hold_m
+        self.next_m = next_m
 
-                if neighbor in self.closed_set and tentative_g_score >= self.g_score.get(neighbor, float('inf')):
-                    continue
+    def compute_piece_expand(self, piece:Piece):
+        """Calcula todas las heuristicas de la pieza para cada columna de grid, sin rotar la pieza"""
+        h_list = np.array([float for i in range(11-piece.get_optimized_current_matrix().shape[1])], dtype=object)
+        max_value = float('-inf')
+        max_index = -1
+        max_indices = None
+        for i in range(len(h_list)):
+            current, indices= self.grid.calculate_heuristics(piece, i)
+            current = sum(current)
 
-                if tentative_g_score < self.g_score.get(neighbor, float('inf')):
-                    self.came_from[neighbor] = current
-                    self.g_score[neighbor] = tentative_g_score
-                    self.f_score[neighbor] = tentative_g_score + self.heuristic(neighbor)
+            h_list[i]= current
+            if current > max_value:
+                max_value = current
+                max_index = i
+                max_indices = indices
 
-                    if neighbor not in self.open_set:
-                        heapq.heappush(self.open_set, (self.f_score[neighbor], neighbor))
+        return (max_value, max_index,max_indices)
 
-        return None
-
-    def get_neighbors(self, node):
-        # Implement your logic to get the neighbors of a given node here
-        pass
-
-    def distance(self, node1, node2):
-        # Implement your logic to calculate the distance between two nodes here
-        pass
-
-    def heuristic(self, node):
-        # Implement your heuristic function here
-        pass
-
-    def reconstruct_path(self, current):
-        path = [current]
-
-        while current in self.came_from:
-            current = self.came_from[current]
-            path.append(current)
-
-        return path[::-1]
+    def compute_piece_all_rotations(self, piece:Piece):
+        """Calcula todas las heuristicas de la pieza para cada columna de grid, rotando la pieza"""
+        h_list_all = np.array( [np.array for _ in range(piece.computable_shapes)], dtype=object)
+       # print(f'grid compute_piece_all_rotations - {0}: \n', self.grid.grid)
+        for i in range(len(h_list_all)):
+            piece.set_current_shape(i)
+            max_v, max_i, max_indices = self.compute_piece_expand(piece)
+            h_list_all[i]=(max_v, max_i, max_indices)
+        piece.set_current_shape(0)
+        return h_list_all
     
+    def get_best_choice(self, piece:Piece):
+        """Calcula la mejor columna para la pieza actual.
 
+        returns: (max_value, max_index, max_rotation)
+        
+        max_value: el valor maximo de la heuristica
+        max_index: la columna donde se encuentra el valor maximo
+        max_rotation: la rotacion que tiene la pieza con la que se obtuvo el valor maximo"""
+        h_list= self.compute_piece_all_rotations(piece)
+        max_index, max_value = max(enumerate(h_list), key=lambda x: x[1][0])
+        print('best_choice:',(max_value[0], max_value[1], max_index))
+        return (max_value[0], max_value[1], max_index, max_value[2])
 
+    def __str__(self):
+        return self.name + " " + self.color
 
-class UCS:
-    def __init__(self, start, goal):
-        self.start = start
-        self.goal = goal
-        self.open_set = []
-        self.closed_set = set()
-        self.came_from = {}
-        self.g_score = {start: 0}
-
-    def run(self):
-        heapq.heappush(self.open_set, (self.g_score[self.start], self.start))
-
-        while self.open_set:
-            current = heapq.heappop(self.open_set)[1]
-
-            if current == self.goal:
-                return self.reconstruct_path(current)
-
-            self.closed_set.add(current)
-
-            for neighbor in self.get_neighbors(current):
-                tentative_g_score = self.g_score[current] + self.distance(current, neighbor)
-
-                if neighbor in self.closed_set and tentative_g_score >= self.g_score.get(neighbor, float('inf')):
-                    continue
-
-                if tentative_g_score < self.g_score.get(neighbor, float('inf')):
-                    self.came_from[neighbor] = current
-                    self.g_score[neighbor] = tentative_g_score
-
-                    if neighbor not in self.open_set:
-                        heapq.heappush(self.open_set, (self.g_score[neighbor], neighbor))
-
-        return None
-
-    def get_neighbors(self, node):
-        # Implement your logic to get the neighbors of a given node here
-        pass
-
-    def distance(self, node1, node2):
-        # Implement your logic to calculate the distance between two nodes here
-        pass
-
-    def reconstruct_path(self, current):
-        path = [current]
-
-        while current in self.came_from:
-            current = self.came_from[current]
-            path.append(current)
-
-        return path[::-1]
-    
-
-
-
-
-
-class Node:
-    def __init__(self, piece: Piece, heuristics, ASheuristic):
-        self.piece = piece
-        self.heuristics = heuristics
-        self.ASheuristic = ASheuristic
