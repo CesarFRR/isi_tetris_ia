@@ -14,12 +14,6 @@ from model.Pieces import Piece
 import time
 import os
 
-options = webdriver.ChromeOptions()
-options.add_argument('--log-level=3')  # Esto ajusta el nivel de registro a ERROR
-
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-
 JS_DROP_FILE = """
     var target = arguments[0],
         offsetX = arguments[1],
